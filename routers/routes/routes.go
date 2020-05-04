@@ -775,6 +775,15 @@ func RegisterRoutes(m *macaron.Macaron) {
 			m.Post("/:id/:action", repo.ChangeMilestonStatus)
 			m.Post("/delete", repo.DeleteMilestone)
 		}, context.RepoMustNotBeArchived(), reqRepoIssuesOrPullsWriter, context.RepoRef())
+		m.Group("/polls", func() {
+			m.Get("", repo.IndexPolls)
+			m.Combo("/new").
+				Get(repo.NewPoll).
+				Post(bindIgnErr(auth.CreatePollForm{}), repo.NewPollPost)
+			m.Get("/:id/edit", repo.EditPoll)
+			m.Post("/:id/edit", bindIgnErr(auth.CreatePollForm{}), repo.EditPollPost)
+			m.Post("/:id/delete", repo.DeletePoll)
+		})
 		m.Group("/pull", func() {
 			m.Post("/:index/target_branch", repo.UpdatePullRequestTarget)
 		}, context.RepoMustNotBeArchived())

@@ -1,0 +1,66 @@
+{{template "base/head" .}}
+<div class="repository new poll">
+	{{template "repo/header" .}}
+	<div class="ui container">
+		<div class="navbar">
+{{/*			{{template "repo/poll/navbar" .}}*/}}
+			{{if and (or .CanWriteIssues .CanWritePulls) .PageIsEditPoll}}
+				<div class="ui right floated secondary menu">
+					<a class="ui green button" href="{{$.RepoLink}}/polls/new">{{.i18n.Tr "repo.polls.new"}}</a>
+				</div>
+			{{end}}
+		</div>
+		<div class="ui divider"></div>
+		<h2 class="ui dividing header">
+			{{if .PageIsEditPoll}}
+				{{.i18n.Tr "repo.polls.edit"}}
+				<div class="sub header">{{.i18n.Tr "repo.polls.edit_subheader"}}</div>
+			{{else}}
+				{{.i18n.Tr "repo.polls.new"}}
+				<div class="sub header">{{.i18n.Tr "repo.polls.new_subheader"}}</div>
+			{{end}}
+		</h2>
+		{{template "base/alert" .}}
+		<form class="ui form grid" action="{{.Link}}" method="post">
+			{{.CsrfTokenHtml}}
+			<div class="eleven wide column">
+				<div class="field {{if .Err_Title}}error{{end}}">
+					{{/* form_poll_subject or form-poll-subject ? */}}
+					<label for="form_poll_subject">{{.i18n.Tr "repo.polls.subject.label"}}</label>
+					<input id="form_poll_subject" name="subject" placeholder="{{.i18n.Tr "repo.polls.subject.placeholder"}}"
+						   value="{{.subject}}" autofocus required maxlength="128">
+				</div>
+				<div class="field">
+					<label for="form_poll_description">{{.i18n.Tr "repo.polls.description.label"}}</label>
+					<textarea id="form_poll_description" name="description">{{.description}}</textarea>
+				</div>
+			</div>
+			<div class="seven wide column">
+				<div class="disabled field">
+					<label for="form_poll_gradation">{{.i18n.Tr "repo.polls.gradation.label"}}</label>
+					<select id="form_poll_gradation" name="gradation" class="emote">
+						<option value="emote6">🤩 😀 🙂 😐 😒 🤮</option>
+					</select>
+				</div>
+			</div>
+			<div class="ui container">
+				<div class="ui divider"></div>
+				<div class="ui right">
+					{{if .PageIsEditPoll}}
+						<a class="ui blue basic button" href="{{.RepoLink}}/polls">
+							{{.i18n.Tr "repo.polls.cancel"}}
+						</a>
+						<button class="ui green button">
+							{{.i18n.Tr "repo.polls.modify"}}
+						</button>
+					{{else}}
+						<button class="ui green button">
+							{{.i18n.Tr "repo.polls.create"}}
+						</button>
+					{{end}}
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+{{template "base/footer" .}}
