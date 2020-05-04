@@ -1970,6 +1970,22 @@ func (err ErrOAuthApplicationNotFound) Error() string {
 // |_| \___/_|_| \_____|   \__/ \_,_\__,_\__, |_|_|_\___|_||_\__|
 //                                       |___/
 
+// ErrPollNotFound represents a "PollNotFound" kind of error.
+type ErrPollNotFound struct {
+	ID     int64
+	RepoID int64
+}
+
+// IsErrPollNotFound checks if an error is a ErrPollNotFound.
+func IsErrPollNotFound(err error) bool {
+	_, ok := err.(ErrPollNotFound)
+	return ok
+}
+
+func (err ErrPollNotFound) Error() string {
+	return fmt.Sprintf("poll not found [id: %d, repo_id: %d]", err.ID, err.RepoID)
+}
+
 type ErrJudgmentNotFound struct {
 	Judge       *User
 	Poll        *Poll
