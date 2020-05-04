@@ -14,12 +14,12 @@ import (
 
 // A Poll on <Subject> with the issues of a repository as candidates.
 type Poll struct {
-	ID       int64       `xorm:"pk autoincr"`
-	RepoID   int64       `xorm:"INDEX UNIQUE(repo_index)"`
-	Repo     *Repository `xorm:"-"`
-	Index    int64       `xorm:"UNIQUE(repo_index)"` // Index in one repository.
-	AuthorID int64       `xorm:"INDEX"`
-	Author   *User       `xorm:"-"`
+	ID     int64       `xorm:"pk autoincr"`
+	RepoID int64       `xorm:"INDEX"`
+	Repo   *Repository `xorm:"-"`
+	//Index    int64       `xorm:"UNIQUE(repo_index)"` // Index in one repository.
+	AuthorID int64 `xorm:"INDEX"`
+	Author   *User `xorm:"-"`
 	// When the poll is applied to all the issues, the subject should be an issue's trait.
 	// eg: Quality, Importance, Urgency, Wholeness, Relevance…
 	Subject string `xorm:"name"`
@@ -28,6 +28,8 @@ type Poll struct {
 	Content         string `xorm:"TEXT"`
 	RenderedContent string `xorm:"-"`
 	Ref             string
+
+	AreCandidatesIssues bool
 
 	DeadlineUnix timeutil.TimeStamp `xorm:"INDEX"`
 	CreatedUnix  timeutil.TimeStamp `xorm:"INDEX created"`
