@@ -27,7 +27,8 @@ type Poll struct {
 	// eg: Quality, Importance, Urgency, Wholeness, Relevance…
 	Subject string `xorm:"name"`
 	// Description may be used to describe at length the constitutive details of that poll.
-	// Eg: Rationale, Deliberation Consequences, Modus Operandi…
+	// Eg: Rationale, Deliberation Consequences, Schedule, Modus Operandi…
+	// It can be written in the usual gitea-flavored markdown.
 	Description         string `xorm:"TEXT"`
 	RenderedDescription string `xorm:"-"`
 	Ref                 string // Do we need this?  Are we even using it?  WHat is it?
@@ -40,12 +41,54 @@ type Poll struct {
 	UpdatedUnix  timeutil.TimeStamp `xorm:"INDEX updated"`
 	ClosedUnix   timeutil.TimeStamp `xorm:"INDEX"`
 
+	// No idea how xorm works -- help!
 	//Judgments         []*Judgment    `xorm:"-"`
 	//Judgments         JudgmentList   `xorm:"-"`
 }
 
 // PollList is a list of polls offering additional functionality (perhaps)
 type PollList []*Poll
+
+func (poll *Poll) GetGradationList(gradation string) []string {
+	list := make([]string, 0, 6)
+
+	// Placeholder until user customization somehow
+	// - 🤮😒😐🙂😀🤩
+	// - 😫😒😐😌😀😍  (more support, apparently)
+	// - …
+	list = append(list, "🤮")
+	list = append(list, "😒")
+	list = append(list, "😐")
+	list = append(list, "🙂")
+	list = append(list, "😀")
+	list = append(list, "🤩")
+
+	return list
+}
+
+func (poll *Poll) GetJudgmentOnCandidate(judge *User, candidateID int64) (judgmernt *Judgment) {
+	judgment, err := getJudgmentOfJudgeOnPollCandidate(x, judge.ID, poll.ID, candidateID)
+	if nil != err {
+		return nil
+	}
+
+	return judgment
+}
+
+func (poll *Poll) GetResult() (results *PollResult) {
+	// The deliberator should probably be a parameter of this function,
+	// and upstream we could fetch it from context or settings.
+	deliberator := &PollNaiveDeliberator{
+		UseHighMean: false,
+	}
+
+	results, err := deliberator.Deliberate(poll)
+	if nil != err {
+		return nil // What should we do here?
+	}
+
+	return results
+}
 
 // $ figlet -w 120 "Create"
 //   ____                _
@@ -210,17 +253,4 @@ func DeletePollByRepoID(repoID, id int64) error {
 	}
 
 	return sess.Commit()
-}
-
-func GetGradationList(gradation string) []string {
-	list := make([]string, 0, 6)
-
-	list[0] = "🤮"
-	list[1] = "😒"
-	list[2] = "😐"
-	list[3] = "🙂"
-	list[4] = "😀"
-	list[5] = "🤩"
-
-	return list
 }

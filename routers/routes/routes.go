@@ -783,6 +783,7 @@ func RegisterRoutes(m *macaron.Macaron) {
 			m.Get("/:id/edit", repo.EditPoll)
 			m.Post("/:id/edit", bindIgnErr(auth.CreatePollForm{}), repo.EditPollPost)
 			m.Post("/:id/delete", repo.DeletePoll)
+			m.Post("/:id/judgments", repo.EmitJudgment)
 		})
 		m.Group("/pull", func() {
 			m.Post("/:index/target_branch", repo.UpdatePullRequestTarget)

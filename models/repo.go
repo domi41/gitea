@@ -601,6 +601,10 @@ func (repo *Repository) deleteWiki(e Engine) error {
 	return err
 }
 
+func (repo *Repository) GetPolls() (_ PollList, err error) {
+	return GetPolls(repo.ID, 0)
+}
+
 func (repo *Repository) getAssignees(e Engine) (_ []*User, err error) {
 	if err = repo.getOwner(e); err != nil {
 		return nil, err
