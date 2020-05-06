@@ -56,12 +56,12 @@ func (poll *Poll) GetGradationList(gradation string) []string {
 	// - 🤮😒😐🙂😀🤩
 	// - 😫😒😐😌😀😍  (more support, apparently)
 	// - …
-	list = append(list, "🤮")
+	list = append(list, "😫")
 	list = append(list, "😒")
 	list = append(list, "😐")
-	list = append(list, "🙂")
+	list = append(list, "😌")
 	list = append(list, "😀")
-	list = append(list, "🤩")
+	list = append(list, "😍")
 
 	return list
 }
