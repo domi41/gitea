@@ -16,6 +16,7 @@
 			</div>
 		{{end}}
 	</div>
+
 	{{if .HasMerged}}
 		<div class="ui purple large label">{{svg "octicon-git-merge" 16}} {{.i18n.Tr "repo.pulls.merged"}}</div>
 	{{else if .Issue.IsClosed}}
@@ -25,6 +26,10 @@
 	{{else}}
 		<div class="ui green large label">{{svg "octicon-issue-opened" 16}} {{.i18n.Tr "repo.issues.open_title"}}</div>
 	{{end}}
+
+	{{ range $poll := .Polls }}
+	{{ template "repo/issue/view_title/poll_badge" Dict "Issue" $.Issue "Poll" $poll "Super" $ }}
+	{{ end }}
 
 	{{if .Issue.IsPull}}
 		{{if .Issue.PullRequest.HasMerged}}

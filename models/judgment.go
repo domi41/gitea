@@ -52,6 +52,12 @@ type UpdateJudgmentOptions struct {
 	CandidateID int64
 }
 
+type DeleteJudgmentOptions struct {
+	Poll        *Poll
+	Judge       *User
+	CandidateID int64
+}
+
 func CreateJudgment(opts *CreateJudgmentOptions) (judgment *Judgment, err error) {
 	sess := x.NewSession()
 	defer sess.Close()
@@ -103,19 +109,15 @@ func getJudgmentByID(e Engine, id int64) (*Judgment, error) {
 	return repo, nil
 }
 
-func UpdateJudgment(opts *UpdateJudgmentOptions) (judgment *Judgment, err error) {
-	sess := x.NewSession()
-	defer sess.Close()
-	if err = sess.Begin(); err != nil {
-		return nil, err
-	}
-
+func getJudgmentOfJudgeOnPollCandidate(e Engine, judgeID int64, pollID int64, candidateID int64) (judgment *Judgment, err error) {
+	// We could probably use only one SQL query instead of two here.
+	// No idea how this ORM works, and sprinting past it with snippet copy-pasting.
 	judgmentsIds := make([]int64, 0, 1)
-	if err = sess.Table("judgment").
+	if err = e.Table("judgment").
 		Cols("id").
-		Where("`judgment`.judge_id = ?", opts.Judge.ID).
-		And("`judgment`.poll_id = ?", opts.Poll.ID).
-		And("`judgment`.candidate_id = ?", opts.CandidateID).
+		Where("`judgment`.judge_id = ?", judgeID).
+		And("`judgment`.poll_id = ?", pollID).
+		And("`judgment`.candidate_id = ?", candidateID).
 		Limit(1).
 		Find(&judgmentsIds); err != nil {
 		return nil, fmt.Errorf("Find Judgment: %v", err)
@@ -125,9 +127,24 @@ func UpdateJudgment(opts *UpdateJudgmentOptions) (judgment *Judgment, err error)
 		return nil, ErrJudgmentNotFound{}
 	}
 
-	judgment, errj := getJudgmentByID(sess, judgmentsIds[0])
+	judgment, errj := getJudgmentByID(e, judgmentsIds[0])
 	if errj != nil {
 		return nil, errj
+	}
+
+	return judgment, nil
+}
+
+func UpdateJudgment(opts *UpdateJudgmentOptions) (judgment *Judgment, err error) {
+	sess := x.NewSession()
+	defer sess.Close()
+	if err = sess.Begin(); err != nil {
+		return nil, err
+	}
+
+	judgment, errJ := getJudgmentOfJudgeOnPollCandidate(sess, opts.Judge.ID, opts.Poll.ID, opts.CandidateID)
+	if nil != errJ {
+		return nil, errJ
 	}
 
 	judgment.Grade = opts.Grade
@@ -144,4 +161,27 @@ func UpdateJudgment(opts *UpdateJudgmentOptions) (judgment *Judgment, err error)
 	}
 
 	return judgment, nil
+}
+
+func DeleteJudgment(opts *DeleteJudgmentOptions) (err error) {
+	sess := x.NewSession()
+	defer sess.Close()
+	if err := sess.Begin(); err != nil {
+		return err
+	}
+
+	judgment, errJ := getJudgmentOfJudgeOnPollCandidate(sess, opts.Judge.ID, opts.Poll.ID, opts.CandidateID)
+	if nil != errJ {
+		return errJ
+	}
+
+	if _, errD := sess.Delete(judgment); nil != errD {
+		return errD
+	}
+
+	if err = sess.Commit(); nil != err {
+		return err
+	}
+
+	return nil
 }
