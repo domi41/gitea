@@ -61,7 +61,7 @@ func EmitJudgment(ctx *context.Context) {
 			_, errU := models.UpdateJudgment(&models.UpdateJudgmentOptions{
 				Poll:        poll,
 				Judge:       judge,
-				Grade:       int8(grade),
+				Grade:       grade,
 				CandidateID: candidateID,
 			})
 			if nil != errU {
@@ -78,7 +78,7 @@ func EmitJudgment(ctx *context.Context) {
 		_, errC := models.CreateJudgment(&models.CreateJudgmentOptions{
 			Poll:        poll,
 			Judge:       judge,
-			Grade:       int8(grade),
+			Grade:       grade,
 			CandidateID: candidateID,
 		})
 		if nil != errC {
