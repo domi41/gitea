@@ -120,7 +120,7 @@ func getJudgmentOfJudgeOnPollCandidate(e Engine, judgeID int64, pollID int64, ca
 		And("`judgment`.candidate_id = ?", candidateID).
 		Limit(1).
 		Find(&judgmentsIds); err != nil {
-		return nil, fmt.Errorf("Find Judgment: %v", err)
+		return nil, fmt.Errorf("find judgment: %v", err)
 	}
 
 	if 0 == len(judgmentsIds) {
