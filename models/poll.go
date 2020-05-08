@@ -128,12 +128,13 @@ func CreatePoll(opts *CreatePollOptions) (poll *Poll, err error) {
 
 func createPoll(e *xorm.Session, opts *CreatePollOptions) (_ *Poll, err error) {
 	poll := &Poll{
-		AuthorID:    opts.Author.ID,
-		Author:      opts.Author,
-		RepoID:      opts.Repo.ID,
-		Repo:        opts.Repo,
-		Subject:     opts.Subject,
-		Description: opts.Description,
+		AuthorID:            opts.Author.ID,
+		Author:              opts.Author,
+		RepoID:              opts.Repo.ID,
+		Repo:                opts.Repo,
+		Subject:             opts.Subject,
+		Description:         opts.Description,
+		AreCandidatesIssues: true,
 	}
 	if _, err = e.Insert(poll); err != nil {
 		return nil, err
