@@ -7,6 +7,7 @@ package models
 
 import (
 	"code.gitea.io/gitea/modules/setting"
+	"fmt"
 	"strings"
 
 	//"code.gitea.io/gitea/modules/references"
@@ -49,10 +50,10 @@ type Poll struct {
 // PollList is a list of polls offering additional functionality (perhaps)
 type PollList []*Poll
 
-func (poll *Poll) GetGradationList(gradation string) []string {
+func (poll *Poll) GetGradationList() []string {
 	list := make([]string, 0, 6)
 
-	// Placeholder until user customization somehow
+	// Placeholder until user customization somehow (poll.Gradation?)
 	// - 🤮😒😐🙂😀🤩
 	// - 😫😒😐😌😀😍  (more support, apparently)
 	// - …
@@ -64,6 +65,20 @@ func (poll *Poll) GetGradationList(gradation string) []string {
 	list = append(list, "😍")
 
 	return list
+}
+
+func (poll *Poll) GetCandidatesIDs() (_ []int64, err error) {
+	ids := make([]int64, 0, 10)
+	if err := x.Table("judgment").
+		Select("DISTINCT candidate_id").
+		Where("poll_id = ?", poll.ID).
+		//And("updated_unix >= ?", start).
+		//GroupBy("context_hash").
+		//OrderBy("max( id ) desc").
+		Find(&ids); err != nil {
+		return nil, err
+	}
+	return ids, nil
 }
 
 func (poll *Poll) GetJudgmentOnCandidate(judge *User, candidateID int64) (judgmernt *Judgment) {
@@ -88,6 +103,27 @@ func (poll *Poll) GetResult() (results *PollResult) {
 	}
 
 	return results
+}
+
+func (poll *Poll) CountGrades(candidateID int64, grade uint8) (_ uint64, err error) {
+	rows := make([]int64, 0, 2)
+	//amount := 0
+	if err := x.Table("judgment").
+		Select("COUNT(*) as amount").
+		Where("poll_id = ?", poll.ID).
+		And("candidate_id = ?", candidateID).
+		And("grade = ?", grade).
+		//GroupBy("context_hash").
+		//OrderBy("max( id ) desc").
+		Find(&rows); err != nil {
+		return 0, err
+	}
+	if 1 != len(rows) {
+		return 0, fmt.Errorf("wrong amount of COUNT()")
+	}
+
+	amount := uint64(rows[0])
+	return amount, nil
 }
 
 // $ figlet -w 120 "Create"
