@@ -1,13 +1,21 @@
-// Copyright 2014 The Gogs Authors. All rights reserved.
 // Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
 package models
 
+import "code.gitea.io/gitea/modules/timeutil"
+
 type PollDeliberator interface {
 	Deliberate(poll *Poll) (result *PollResult, err error)
 }
+
+//  _   _       _
+// | \ | | __ _(_)_   _____
+// |  \| |/ _` | \ \ / / _ \
+// | |\  | (_| | |\ V /  __/
+// |_| \_|\__,_|_| \_/ \___|
+//
 
 type PollNaiveDeliberator struct {
 	UseHighMean bool // should default to false ; strategy for even number of judgments
@@ -15,26 +23,43 @@ type PollNaiveDeliberator struct {
 
 func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err error) {
 
-	c := make([]*PollCandidateResult, 0, 100)
+	naiveTallier := &PollNaiveTallier{}
+	pollTally, err := naiveTallier.Tally(poll)
+	if nil != err {
+		return nil, err
+	}
 
-	c = append(c, &PollCandidateResult{
-		Poll:        poll,
-		CandidateID: 0,
-		Position:    0,
-		MedianGrade: 5,
-		//Tally:       *PollCandidateTally
-		//CreatedUnix: timeutil.TimeStamp
-	})
+	candidates := make([]*PollCandidateResult, 0, 100)
+
+	for _, candidateTally := range pollTally.Candidates {
+
+		candidates = append(candidates, &PollCandidateResult{
+			Poll:        poll,
+			CandidateID: candidateTally.CandidateID,
+			Position:    0, // FIXME
+			MedianGrade: 5, // FIXME
+			//Tally:       *PollCandidateTally
+			//CreatedUnix: timeutil.TimeStamp
+		})
+
+	}
 
 	result := &PollResult{
 		Poll:        poll,
-		Tally:       nil, // FIXME
-		Candidates:  c,   // FIXME
-		CreatedUnix: 0,   // FIXME
+		Tally:       pollTally,
+		Candidates:  candidates,
+		CreatedUnix: timeutil.TimeStampNow(),
 	}
 
 	return result, nil
 }
+
+//  ____                 _
+// / ___|  ___ ___  _ __(_)_ __   __ _
+// \___ \ / __/ _ \| '__| | '_ \ / _` |
+//  ___) | (_| (_) | |  | | | | | (_| |
+// |____/ \___\___/|_|  |_|_| |_|\__, |
+//                               |___/
 
 /*
 // Assume that each candidate has the same amount of judgments = MAX_JUDGES.

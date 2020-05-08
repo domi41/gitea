@@ -1,4 +1,3 @@
-// Copyright 2014 The Gogs Authors. All rights reserved.
 // Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
@@ -72,9 +71,7 @@ func (poll *Poll) GetCandidatesIDs() (_ []int64, err error) {
 	if err := x.Table("judgment").
 		Select("DISTINCT candidate_id").
 		Where("poll_id = ?", poll.ID).
-		//And("updated_unix >= ?", start).
-		//GroupBy("context_hash").
-		//OrderBy("max( id ) desc").
+		OrderBy("candidate_id asc").
 		Find(&ids); err != nil {
 		return nil, err
 	}
@@ -107,14 +104,13 @@ func (poll *Poll) GetResult() (results *PollResult) {
 
 func (poll *Poll) CountGrades(candidateID int64, grade uint8) (_ uint64, err error) {
 	rows := make([]int64, 0, 2)
-	//amount := 0
+
 	if err := x.Table("judgment").
 		Select("COUNT(*) as amount").
 		Where("poll_id = ?", poll.ID).
 		And("candidate_id = ?", candidateID).
 		And("grade = ?", grade).
-		//GroupBy("context_hash").
-		//OrderBy("max( id ) desc").
+		// Use Get() perhaps?
 		Find(&rows); err != nil {
 		return 0, err
 	}
@@ -274,7 +270,7 @@ func DeletePollByRepoID(repoID, id int64) error {
 	m, err := GetPollByRepoID(repoID, id)
 	if err != nil {
 		if IsErrPollNotFound(err) {
-			return nil
+			return nil // not very confident in this ; yelling is best?
 		}
 		return err
 	}
