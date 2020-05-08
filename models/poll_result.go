@@ -10,27 +10,6 @@ import (
 	"code.gitea.io/gitea/modules/timeutil"
 )
 
-type PollCandidateJudgmentTally struct {
-	Grade       int8
-	Amount      int64
-	CreatedUnix timeutil.TimeStamp
-}
-
-type PollCandidateTally struct {
-	Poll            *Poll
-	CandidateID     int64 // Issue Index (or internal candidate index, later on)
-	Judgments       []*PollCandidateJudgmentTally
-	JudgmentsAmount int64
-	CreatedUnix     timeutil.TimeStamp
-}
-
-type PollTally struct {
-	Poll               *Poll
-	MaxJudgmentsAmount int64 // per candidate, will help including default grade 0=TO_REJECT
-	Candidates         []*PollCandidateTally
-	CreatedUnix        timeutil.TimeStamp
-}
-
 type PollCandidateResult struct {
 	Poll        *Poll
 	CandidateID int64 // Issue Index (or internal candidate index, later on)
@@ -48,7 +27,12 @@ type PollResult struct {
 }
 
 func (result *PollResult) GetCandidate(candidateID int64) (_ *PollCandidateResult) {
-	return result.Candidates[0] // FIXME
+	for _, candidate := range result.Candidates {
+		if candidate.CandidateID == candidateID {
+			return candidate
+		}
+	}
+	return nil
 }
 
 func (result *PollCandidateResult) GetColorWord() (_ string) {

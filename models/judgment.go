@@ -32,7 +32,7 @@ type Judgment struct {
 	// 5 = excellent
 	// Make sure 0 always means *something* in your graduation
 	// Various graduations are provided <???>.
-	Grade int8
+	Grade uint8
 
 	CreatedUnix timeutil.TimeStamp `xorm:"INDEX created"`
 	UpdatedUnix timeutil.TimeStamp `xorm:"INDEX updated"`
@@ -41,14 +41,14 @@ type Judgment struct {
 type CreateJudgmentOptions struct {
 	Poll        *Poll
 	Judge       *User
-	Grade       int8
+	Grade       uint8
 	CandidateID int64
 }
 
 type UpdateJudgmentOptions struct {
 	Poll        *Poll
 	Judge       *User
-	Grade       int8
+	Grade       uint8
 	CandidateID int64
 }
 
@@ -118,7 +118,7 @@ func getJudgmentOfJudgeOnPollCandidate(e Engine, judgeID int64, pollID int64, ca
 		Where("`judgment`.judge_id = ?", judgeID).
 		And("`judgment`.poll_id = ?", pollID).
 		And("`judgment`.candidate_id = ?", candidateID).
-		Limit(1).
+		Limit(1). // perhaps .Get() is what we need here?
 		Find(&judgmentsIds); err != nil {
 		return nil, fmt.Errorf("find judgment: %v", err)
 	}
