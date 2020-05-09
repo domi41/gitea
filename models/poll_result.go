@@ -1,4 +1,3 @@
-// Copyright 2014 The Gogs Authors. All rights reserved.
 // Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
@@ -12,12 +11,20 @@ import (
 
 type PollCandidateResult struct {
 	Poll        *Poll
-	CandidateID int64 // Issue Index (or internal candidate index, later on)
-	Position    int64 // Two Candidates may share the same Position (perfect equality)
+	CandidateID int64  // Issue Index (or internal candidate index, later on)
+	Position    uint64 // Two Candidates may share the same Position (perfect equality)
 	MedianGrade uint8
+	Score       string
 	Tally       *PollCandidateTally
 	CreatedUnix timeutil.TimeStamp
 }
+
+// PollCandidateResults implements sort.Interface based on the Score field.
+type PollCandidateResults []*PollCandidateResult
+
+func (a PollCandidateResults) Len() int           { return len(a) }
+func (a PollCandidateResults) Less(i, j int) bool { return a[i].Score < a[j].Score }
+func (a PollCandidateResults) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 type PollResult struct {
 	Poll        *Poll

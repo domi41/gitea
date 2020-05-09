@@ -75,7 +75,7 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.NotNil(t, result.Tally)
 	assert.NotNil(t, result.Candidates)
 	assert.Len(t, result.Candidates, 1)
-	assert.Equal(t, int64(0), result.Candidates[0].Position)
+	assert.Equal(t, uint64(0), result.Candidates[0].Position)
 
 	// Add another judgment from Bob
 
@@ -93,9 +93,11 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.NotNil(t, result.Candidates)
 	assert.Len(t, result.Candidates, 2)
-	assert.Equal(t, int64(0), result.Candidates[0].Position)
-	assert.Equal(t, int64(1), result.Candidates[1].Position)
+	assert.Equal(t, uint64(0), result.Candidates[0].Position)
+	assert.Equal(t, uint64(1), result.Candidates[1].Position)
 	assert.Equal(t, int64(1), result.Candidates[0].CandidateID)
 	assert.Equal(t, int64(2), result.Candidates[1].CandidateID)
+	assert.Equal(t, uint8(2), result.Candidates[0].MedianGrade)
+	assert.Equal(t, uint8(0), result.Candidates[1].MedianGrade)
 
 }

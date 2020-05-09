@@ -4,7 +4,11 @@
 
 package models
 
-import "code.gitea.io/gitea/modules/timeutil"
+import (
+	"code.gitea.io/gitea/modules/timeutil"
+	"fmt"
+	"sort"
+)
 
 type PollDeliberator interface {
 	Deliberate(poll *Poll) (result *PollResult, err error)
@@ -29,19 +33,36 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 		return nil, err
 	}
 
-	candidates := make([]*PollCandidateResult, 0, 100)
+	candidates := make(PollCandidateResults, 0, 64)
 
 	for _, candidateTally := range pollTally.Candidates {
+
+		medianGrade := candidateTally.GetMedian()
+		//candidateScore := candidateTally.GetScore()
+		candidateScore := deli.GetScore(candidateTally)
 
 		candidates = append(candidates, &PollCandidateResult{
 			Poll:        poll,
 			CandidateID: candidateTally.CandidateID,
-			Position:    0, // FIXME
-			MedianGrade: 5, // FIXME
-			//Tally:       *PollCandidateTally
-			//CreatedUnix: timeutil.TimeStamp
+			Position:    0, // We set it below after the Sort
+			MedianGrade: medianGrade,
+			Score:       candidateScore,
+			Tally:       candidateTally,
+			CreatedUnix: timeutil.TimeStampNow(),
 		})
 
+	}
+
+	sort.Sort(sort.Reverse(candidates))
+
+	previousScore := ""
+	for key, candidate := range candidates {
+		position := uint64(key + 1)
+		if (previousScore == candidate.Score) && (key > 0) {
+			position = candidates[key-1].Position
+		}
+		candidate.Position = position
+		previousScore = candidate.Score
 	}
 
 	result := &PollResult{
@@ -60,6 +81,18 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 //  ___) | (_| (_) | |  | | | | | (_| |
 // |____/ \___\___/|_|  |_|_| |_|\__, |
 //                               |___/
+
+func (deli *PollNaiveDeliberator) GetScore(pct *PollCandidateTally) (_ string) {
+	score := ""
+
+	//ct := *pct
+	// FIXME: Not THAT naive :)
+	score += fmt.Sprintf("%03d", pct.GetMedian())
+
+	//println("Score: "+score)
+
+	return score
+}
 
 /*
 // Assume that each candidate has the same amount of judgments = MAX_JUDGES.
