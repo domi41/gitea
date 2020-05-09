@@ -1,4 +1,3 @@
-// Copyright 2014 The Gogs Authors. All rights reserved.
 // Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
@@ -17,11 +16,30 @@ type PollCandidateGradeTally struct {
 
 type PollCandidateTally struct {
 	Poll            *Poll
-	CandidateID     int64 // Issue Index (or internal candidate index, later on)
-	Grades          []*PollCandidateGradeTally
+	CandidateID     int64                      // Issue Index (or internal candidate index, later on)
+	Grades          []*PollCandidateGradeTally // sorted by grade
 	JudgmentsAmount uint64
 	CreatedUnix     timeutil.TimeStamp
 }
+
+func (pct *PollCandidateTally) GetMedian() (_ uint8) {
+	medianIndex := pct.JudgmentsAmount / 2
+	cursorIndex := uint64(0)
+	for _, grade := range pct.Grades {
+		if 0 < grade.Amount {
+			cursorIndex += grade.Amount
+			if cursorIndex >= medianIndex {
+				return grade.Grade
+			}
+		}
+	}
+	println("warning: GetMedian defaulting to 0")
+	return uint8(0)
+}
+
+//func (pct *PollCandidateTally) GetScore() (_ string) {
+//
+//}
 
 type PollTally struct {
 	Poll               *Poll
@@ -29,6 +47,20 @@ type PollTally struct {
 	Candidates         []*PollCandidateTally
 	CreatedUnix        timeutil.TimeStamp
 }
+
+//// PollCandidateGrades implements sort.Interface based on the Score field.
+//type PollCandidateGrades []*PollCandidateGradeTally
+//
+//func (a PollCandidateGrades) Len() int           { return len(a) }
+//func (a PollCandidateGrades) Less(i, j int) bool { return a[i].Score < a[j].Score }
+//func (a PollCandidateGrades) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+//  _____     _ _ _
+// |_   _|_ _| | (_) ___ _ __
+//   | |/ _` | | | |/ _ \ '__|
+//   | | (_| | | | |  __/ |
+//   |_|\__,_|_|_|_|\___|_|
+//
 
 type PollTallier interface {
 	Tally(poll *Poll) (tally *PollTally, err error)
@@ -53,7 +85,6 @@ func (tallier *PollNaiveTallier) Tally(poll *Poll) (_ *PollTally, err error) {
 	}
 
 	candidates := make([]*PollCandidateTally, 0, 64)
-
 	maximumAmount := uint64(0)
 
 	for _, candidateID := range candidatesIDs {

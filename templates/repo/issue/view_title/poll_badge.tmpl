@@ -3,6 +3,7 @@
 {{ $pollID := .Poll.ID }}
 {{ $pollCandidateResult := ($pollResult.GetCandidate $candidateID) }}
 {{ $medianColorWord := $pollCandidateResult.GetColorWord }}
+{{/*{{ $pollPosition := $pollCandidateResult.Position }}*/}}
 {{/*{{ $judgment := nil }}  ???  */}}
 {{ $judgment := "" }}
 {{ if $.Super.IsSigned }}
@@ -17,7 +18,13 @@
 {{/* Wrapper for the :hover, old school */}}
 <div class="ui judgment-wrapper">
 
-	<div class="ui large label {{ $medianColorWord }}">{{ svg "octicon-law" 16 }} {{ .Poll.Subject }} 🤩</div>
+	<div class="ui large label {{ $medianColorWord }}">
+		{{ svg "octicon-law" 16 }}
+		{{ .Poll.Subject }}
+		{{ if $pollCandidateResult }}
+		N°{{ $pollCandidateResult.Position }}
+		{{ end }}
+	</div>
 
 	{{ if $.Super.IsSigned }}
 	<div class="judgment-forms">
