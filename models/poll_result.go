@@ -14,7 +14,7 @@ type PollCandidateResult struct {
 	Poll        *Poll
 	CandidateID int64 // Issue Index (or internal candidate index, later on)
 	Position    int64 // Two Candidates may share the same Position (perfect equality)
-	MedianGrade int8
+	MedianGrade uint8
 	Tally       *PollCandidateTally
 	CreatedUnix timeutil.TimeStamp
 }
