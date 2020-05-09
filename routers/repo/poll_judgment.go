@@ -24,7 +24,7 @@ type CreateJudgmentResponse struct {
 func EmitJudgment(ctx *context.Context) {
 	judge := ctx.User
 
-	grade := int8(ctx.QueryInt("grade")) // 0 if not defined
+	grade := uint8(ctx.QueryInt("grade")) // 0 if not defined
 	if grade < 1 {
 		grade = 0
 	}
