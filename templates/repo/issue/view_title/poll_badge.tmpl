@@ -3,7 +3,6 @@
 {{ $pollID := .Poll.ID }}
 {{ $pollCandidateResult := ($pollResult.GetCandidate $candidateID) }}
 {{ $medianColorWord := $pollCandidateResult.GetColorWord }}
-{{/*{{ $pollPosition := $pollCandidateResult.Position }}*/}}
 {{/*{{ $judgment := nil }}  ???  */}}
 {{ $judgment := "" }}
 {{ if $.Super.IsSigned }}
@@ -42,13 +41,13 @@
 
 </div>
 
+{{/* Inline styles !  As long as we don't know how to integrate with Gitea, this'll have to do.  */}}
 <style>
-	h1 {
-		/* Otherwise the h1 blocks a portion of the label's hover area */
-		pointer-events: none;
-	}
 	.judgment-wrapper {
 		display: inline-block;
+		/* Otherwise the h1 blocks a portion of the label's hover area */
+		position: relative;
+		z-index: 1;
 	}
 	.judgment-wrapper:hover .judgment-forms {
 		display: inline-block;
@@ -57,7 +56,6 @@
 	}
 	.judgment-forms {
 		display: none;
-		/*line-height: 1;*/
 		vertical-align: middle;
 		position: relative;
 		top: 0;
