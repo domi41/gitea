@@ -43,5 +43,20 @@ func (result *PollResult) GetCandidate(candidateID int64) (_ *PollCandidateResul
 }
 
 func (result *PollCandidateResult) GetColorWord() (_ string) {
-	return "red" // FIXME
+	switch result.MedianGrade {
+	case 0:
+		return "red"
+	case 1:
+		return "red"
+	case 2:
+		return "orange"
+	case 3:
+		return "yellow"
+	case 4:
+		return "olive"
+	case 5:
+		return "green"
+	default:
+		return "green"
+	}
 }
