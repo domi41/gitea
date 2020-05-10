@@ -5,6 +5,7 @@
 package models
 
 import (
+	"code.gitea.io/gitea/modules/timeutil"
 	//"sort"
 	"testing"
 	//"time"
@@ -91,4 +92,48 @@ func TestTally(t *testing.T) {
 
 	assert.Len(t, tally.Candidates, 2)
 	assert.Equal(t, uint64(2), tally.MaxJudgmentsAmount)
+}
+
+func TestPollCandidateTally_GetMedian(t *testing.T) {
+	tally := buildCandidateTally([]int{2, 3, 5, 7, 11, 13})
+	assert.Equal(t, uint8(4), tally.GetMedian())
+
+	tally = buildCandidateTally([]int{0, 0, 0, 0, 0, 0})
+	assert.Equal(t, uint8(0), tally.GetMedian())
+
+	tally = buildCandidateTally([]int{0, 0, 0, 1, 0, 0})
+	assert.Equal(t, uint8(3), tally.GetMedian())
+
+	tally = buildCandidateTally([]int{0, 0, 1, 0, 0, 1})
+	assert.Equal(t, uint8(2), tally.GetMedian())
+
+	tally = buildCandidateTally([]int{1, 0, 1, 0, 0, 1})
+	assert.Equal(t, uint8(2), tally.GetMedian())
+
+	tally = buildCandidateTally([]int{1, 0, 1, 0, 0, 3})
+	assert.Equal(t, uint8(5), tally.GetMedian())
+
+	tally = buildCandidateTally([]int{0, 2, 2})
+	assert.Equal(t, uint8(1), tally.GetMedian())
+}
+
+func buildCandidateTally(grades []int) (_ *PollCandidateTally) {
+	things := make([]*PollCandidateGradeTally, 0, len(grades))
+	totalAmount := 0
+	for grade, amount := range grades {
+		things = append(things, &PollCandidateGradeTally{
+			Grade:       uint8(grade),
+			Amount:      uint64(amount),
+			CreatedUnix: timeutil.TimeStampNow(),
+		})
+		totalAmount += amount
+	}
+
+	return &PollCandidateTally{
+		Poll:            nil, // mock me
+		CandidateID:     0,
+		Grades:          things,
+		JudgmentsAmount: uint64(totalAmount),
+		CreatedUnix:     timeutil.TimeStampNow(),
+	}
 }
