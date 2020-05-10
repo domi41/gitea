@@ -15,7 +15,7 @@
 {{ end }}
 
 {{/* Wrapper for the :hover, old school */}}
-<div class="ui judgment-wrapper">
+<div class="ui judgment-wrapper" tabindex="0">
 
 	<div class="ui large label {{ $medianColorWord }}">
 		{{ svg "octicon-law" 16 }}
@@ -49,6 +49,8 @@
 		position: relative;
 		z-index: 1;
 	}
+	.judgment-wrapper:focus-within .judgment-forms,
+	.judgment-wrapper:focus .judgment-forms,
 	.judgment-wrapper:hover .judgment-forms {
 		display: inline-block;
 		left: -9px;
@@ -69,7 +71,11 @@
 		0% {
 			pointer-events: none;
 			opacity: 0;
-			left: -90px;
+			left: -150px;
+			transform: scale(0.2);
+		}
+		95% {
+			transform: scale(1.0);
 		}
 		99% {
 			pointer-events: none;
@@ -99,6 +105,7 @@
 	.judgment-form:not(.selected) input.emote {
 		filter: grayscale(1.0);
 	}
+	.judgment-form.selected:focus-within::after,
 	.judgment-form.selected:hover::after {
 		color: darkred;
 		position: absolute;
