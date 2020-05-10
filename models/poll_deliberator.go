@@ -33,6 +33,15 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 		return nil, err
 	}
 
+	for _, candidateTally := range pollTally.Candidates {
+		theLost := pollTally.MaxJudgmentsAmount - candidateTally.JudgmentsAmount
+		if 0 < theLost {
+			candidateTally.JudgmentsAmount = pollTally.MaxJudgmentsAmount
+			candidateTally.Grades[0].Amount += theLost
+			//println("Added the lost judgments", theLost)
+		}
+	}
+
 	candidates := make(PollCandidateResults, 0, 64)
 
 	for _, candidateTally := range pollTally.Candidates {
