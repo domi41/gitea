@@ -94,12 +94,22 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 func (deli *PollNaiveDeliberator) GetScore(pct *PollCandidateTally) (_ string) {
 	score := ""
 
-	//ct := *pct
-	// FIXME: Not THAT naive :)
-	score += fmt.Sprintf("%03d", pct.GetMedian())
+	ct := *pct // looks like it's a copy of the primitives at least
 
-	//println("Score: "+score)
+	for _, _ = range pct.Poll.GetGradationList() {
+		//for _, _ = range pct.Poll.GetGrades() {
 
+		medianGrade := ct.GetMedian()
+		score += fmt.Sprintf("%03d", medianGrade)
+
+		groupSize, groupSign, groupGrade := ct.GetBiggestGroup(medianGrade)
+		score += fmt.Sprintf("%012d",
+			int(ct.JudgmentsAmount)+groupSize*groupSign)
+
+		ct.RegradeJudgments(medianGrade, groupGrade)
+	}
+
+	//println("Score: " + score)
 	return score
 }
 

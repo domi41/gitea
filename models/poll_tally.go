@@ -8,38 +8,108 @@ import (
 	"code.gitea.io/gitea/modules/timeutil"
 )
 
+//   ____               _        _____     _ _
+//  / ___|_ __ __ _  __| | ___  |_   _|_ _| | |_   _
+// | |  _| '__/ _` |/ _` |/ _ \   | |/ _` | | | | | |
+// | |_| | | | (_| | (_| |  __/   | | (_| | | | |_| |
+//  \____|_|  \__,_|\__,_|\___|   |_|\__,_|_|_|\__, |
+//                                             |___/
+
 type PollCandidateGradeTally struct {
 	Grade       uint8
 	Amount      uint64
 	CreatedUnix timeutil.TimeStamp
 }
 
+//   ____                _ _     _       _         _____     _ _
+//  / ___|__ _ _ __   __| (_) __| | __ _| |_ ___  |_   _|_ _| | |_   _
+// | |   / _` | '_ \ / _` | |/ _` |/ _` | __/ _ \   | |/ _` | | | | | |
+// | |__| (_| | | | | (_| | | (_| | (_| | ||  __/   | | (_| | | | |_| |
+//  \____\__,_|_| |_|\__,_|_|\__,_|\__,_|\__\___|   |_|\__,_|_|_|\__, |
+//                                                               |___/
+
 type PollCandidateTally struct {
 	Poll            *Poll
 	CandidateID     int64                      // Issue Index (or internal candidate index, later on)
-	Grades          []*PollCandidateGradeTally // sorted by grade
+	Grades          []*PollCandidateGradeTally // Sorted by grade
 	JudgmentsAmount uint64
 	CreatedUnix     timeutil.TimeStamp
 }
 
 func (pct *PollCandidateTally) GetMedian() (_ uint8) {
-	medianIndex := pct.JudgmentsAmount / 2
+
+	if 0 == pct.JudgmentsAmount {
+		return uint8(0)
+		//return 0 // to test
+	}
+
+	adjustedTotal := pct.JudgmentsAmount - 1
+	//if opts.UseHighMedian {
+	//	adjustedTotal := pct.JudgmentsAmount + 1
+	//}
+	medianIndex := adjustedTotal / 2 // Euclidean div
 	cursorIndex := uint64(0)
 	for _, grade := range pct.Grades {
-		if 0 < grade.Amount {
-			cursorIndex += grade.Amount
-			if cursorIndex >= medianIndex {
-				return grade.Grade
-			}
+		if 0 == grade.Amount {
+			continue
+		}
+
+		startIndex := cursorIndex
+		cursorIndex += grade.Amount
+		endIndex := cursorIndex
+		if (startIndex <= medianIndex) && (medianIndex < endIndex) {
+			return grade.Grade
 		}
 	}
 	println("warning: GetMedian defaulting to 0")
 	return uint8(0)
 }
 
-//func (pct *PollCandidateTally) GetScore() (_ string) {
-//
-//}
+func (pct *PollCandidateTally) GetBiggestGroup(aroundGrade uint8) (groupSize int, groupSign int, groupGrade uint8) {
+	belowGroupSize := 0
+	belowGroupSign := -1
+	belowGroupGrade := uint8(0)
+
+	aboveGroupSize := 0
+	aboveGroupSign := 1
+	aboveGroupGrade := uint8(0)
+
+	for k, _ := range pct.Poll.GetGradationList() {
+		grade := uint8(k)
+		//for _, grade := range pct.Poll.GetGrades() {
+		if grade < aroundGrade {
+			belowGroupSize += int(pct.Grades[grade].Amount)
+			belowGroupGrade = grade
+		}
+		if grade > aroundGrade {
+			aboveGroupSize += int(pct.Grades[grade].Amount)
+			if 0 == aboveGroupGrade {
+				aboveGroupGrade = grade
+			}
+		}
+	}
+
+	if aboveGroupSize > belowGroupSize {
+		return aboveGroupSize, aboveGroupSign, aboveGroupGrade
+	}
+	return belowGroupSize, belowGroupSign, belowGroupGrade
+
+}
+
+func (pct *PollCandidateTally) RegradeJudgments(fromGrade uint8, toGrade uint8) {
+	if toGrade == fromGrade {
+		return
+	}
+	pct.Grades[toGrade].Amount += pct.Grades[fromGrade].Amount
+	pct.Grades[fromGrade].Amount = 0
+}
+
+//  _____     _ _
+// |_   _|_ _| | |_   _
+//   | |/ _` | | | | | |
+//   | | (_| | | | |_| |
+//   |_|\__,_|_|_|\__, |
+//                |___/
 
 type PollTally struct {
 	Poll               *Poll
