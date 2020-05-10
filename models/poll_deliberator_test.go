@@ -18,6 +18,7 @@ func TestNaiveDeliberator(t *testing.T) {
 	repo := AssertExistsAndLoadBean(t, &Repository{ID: 1}).(*Repository)
 	userAli := AssertExistsAndLoadBean(t, &User{ID: 1}).(*User)
 	userBob := AssertExistsAndLoadBean(t, &User{ID: 2}).(*User)
+	userCho := AssertExistsAndLoadBean(t, &User{ID: 3}).(*User)
 
 	poll, err := CreatePoll(&CreatePollOptions{
 		Repo:    repo,
@@ -99,5 +100,47 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.Equal(t, int64(2), result.Candidates[1].CandidateID)
 	assert.Equal(t, uint8(2), result.Candidates[0].MedianGrade)
 	assert.Equal(t, uint8(0), result.Candidates[1].MedianGrade)
+
+	// Add another 2 judgments from Cho and one from Ali
+
+	judgment, err = CreateJudgment(&CreateJudgmentOptions{
+		Judge:       userCho,
+		Poll:        poll,
+		Grade:       4,
+		CandidateID: 1,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, judgment)
+
+	judgment, err = CreateJudgment(&CreateJudgmentOptions{
+		Judge:       userCho,
+		Poll:        poll,
+		Grade:       3,
+		CandidateID: 2,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, judgment)
+
+	judgment, err = CreateJudgment(&CreateJudgmentOptions{
+		Judge:       userAli,
+		Poll:        poll,
+		Grade:       3,
+		CandidateID: 2,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, judgment)
+
+	result, err = pnd.Deliberate(poll)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.NotNil(t, result.Candidates)
+	assert.Len(t, result.Candidates, 2)
+	assert.Equal(t, uint64(1), result.Candidates[0].Position)
+	assert.Equal(t, uint64(2), result.Candidates[1].Position)
+	assert.Equal(t, int64(2), result.Candidates[0].CandidateID)
+	assert.Equal(t, int64(1), result.Candidates[1].CandidateID)
+	//println("C1", result.Candidates[1].MedianGrade)
+	assert.Equal(t, uint8(3), result.Candidates[0].MedianGrade)
+	assert.Equal(t, uint8(3), result.Candidates[1].MedianGrade)
 
 }
