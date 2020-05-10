@@ -14,10 +14,10 @@
 		<h2 class="ui dividing header">
 			{{if .PageIsEditPoll}}
 				{{.i18n.Tr "repo.polls.edit"}}
-				<div class="sub header">{{.i18n.Tr "repo.polls.edit_subheader"}}</div>
+				<div class="sub header">{{.i18n.Tr "repo.polls.edit.subheader"}}</div>
 			{{else}}
 				{{.i18n.Tr "repo.polls.new"}}
-				<div class="sub header">{{.i18n.Tr "repo.polls.new_subheader"}}</div>
+				<div class="sub header">{{.i18n.Tr "repo.polls.new.subheader"}}</div>
 			{{end}}
 		</h2>
 		{{template "base/alert" .}}
