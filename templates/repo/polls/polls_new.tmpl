@@ -23,7 +23,7 @@
 		{{template "base/alert" .}}
 		<form class="ui form grid" action="{{.Link}}" method="post">
 			{{.CsrfTokenHtml}}
-			<div class="eleven wide column">
+			<div class="twelve wide column">
 				<div class="field {{if .Err_Title}}error{{end}}">
 					{{/* form_poll_subject or form-poll-subject ? */}}
 					<label for="form_poll_subject">{{.i18n.Tr "repo.polls.subject.label"}}</label>
@@ -34,15 +34,15 @@
 					<label for="form_poll_description">{{.i18n.Tr "repo.polls.description.label"}}</label>
 					<textarea id="form_poll_description" name="description">{{.description}}</textarea>
 				</div>
-			</div>
-			<div class="seven wide column">
-				<div class="disabled field">
+				<div class="field disabled">
 					<label for="form_poll_gradation">{{.i18n.Tr "repo.polls.gradation.label"}}</label>
 					<select id="form_poll_gradation" name="gradation" class="emote">
-						<option value="emote6">🤩 😀 🙂 😐 😒 🤮</option>
+						<option value="emote6-0" selected>😫 😒 😐 😌 😀 😍</option>
+						<option value="emote6-1">🤮 😒 😐 🙂 😀 🤩</option>
 					</select>
 				</div>
 			</div>
+
 			<div class="ui container">
 				<div class="ui divider"></div>
 				<div class="ui right">
