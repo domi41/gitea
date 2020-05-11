@@ -127,6 +127,13 @@
 					</a>
 				{{end}}
 
+				{{/* TODO: make a permission for reading polls and use it here */}}
+				{{ if (.Permission.CanReadAny $.UnitTypePullRequests $.UnitTypeIssues $.UnitTypeReleases) }}
+					<a class="{{ if .PageIsPolls }}active{{ end }} item" href="{{ .RepoLink }}/polls">
+						{{svg "octicon-law" 16}} {{.i18n.Tr "repo.polls"}}
+					</a>
+				{{ end }}
+
 				{{if and (.Permission.CanReadAny $.UnitTypePullRequests $.UnitTypeIssues $.UnitTypeReleases) (not .IsEmptyRepo)}}
 					<a class="{{if .PageIsActivity}}active{{end}} item" href="{{.RepoLink}}/activity">
 						{{svg "octicon-pulse" 16}} {{.i18n.Tr "repo.activity"}}

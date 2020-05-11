@@ -24,7 +24,7 @@ const (
 // IndexPolls renders an index of all the polls
 func IndexPolls(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("repo.polls.index.title")
-	//ctx.Data["PageIsMilestones"] = true
+	ctx.Data["PageIsPolls"] = true
 
 	page := ctx.QueryInt("page") // 0 if not defined ?
 	if page <= 1 {
@@ -49,6 +49,7 @@ func IndexPolls(ctx *context.Context) {
 // NewPoll renders the "new poll" page with its form
 func NewPoll(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("repo.polls.new")
+	ctx.Data["PageIsPolls"] = true
 
 	//ctx.Data["DateLang"] = setting.DateLang(ctx.Locale.Language())
 
@@ -103,7 +104,7 @@ func ViewPoll(ctx *context.Context) {
 // EditPoll renders editing poll page
 func EditPoll(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("repo.polls.edit")
-	//ctx.Data["PageIsPolls"] = true
+	ctx.Data["PageIsPolls"] = true
 	ctx.Data["PageIsEditPoll"] = true
 	//ctx.Data["DateLang"] = setting.DateLang(ctx.Locale.Language())
 
