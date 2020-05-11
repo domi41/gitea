@@ -780,6 +780,7 @@ func RegisterRoutes(m *macaron.Macaron) {
 			m.Combo("/new").
 				Get(repo.NewPoll).
 				Post(bindIgnErr(auth.CreatePollForm{}), repo.NewPollPost)
+			m.Get("/:id", repo.ViewPoll)
 			m.Get("/:id/edit", repo.EditPoll)
 			m.Post("/:id/edit", bindIgnErr(auth.CreatePollForm{}), repo.EditPollPost)
 			m.Post("/:id/delete", repo.DeletePoll)

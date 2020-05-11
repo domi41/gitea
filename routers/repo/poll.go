@@ -9,6 +9,7 @@ import (
 	"code.gitea.io/gitea/modules/auth"
 	"code.gitea.io/gitea/modules/base"
 	"code.gitea.io/gitea/modules/context"
+	"code.gitea.io/gitea/modules/markup/markdown"
 	//"code.gitea.io/gitea/modules/setting"
 	//"code.gitea.io/gitea/modules/timeutil"
 	//"time"
@@ -16,6 +17,7 @@ import (
 
 const (
 	tplPollsIndex base.TplName = "repo/polls/polls_index"
+	tplPollsView  base.TplName = "repo/polls/polls_view"
 	tplPollsNew   base.TplName = "repo/polls/polls_new"
 )
 
@@ -75,6 +77,27 @@ func NewPollPost(ctx *context.Context, form auth.CreatePollForm) {
 
 	ctx.Flash.Success(ctx.Tr("repo.polls.create_success", form.Subject))
 	ctx.Redirect(ctx.Repo.RepoLink + "/polls")
+}
+
+// ViewPoll renders display poll page
+func ViewPoll(ctx *context.Context) {
+	ctx.Data["Title"] = ctx.Tr("repo.polls.view")
+
+	poll, err := models.GetPollByRepoID(ctx.Repo.Repository.ID, ctx.ParamsInt64(":id"))
+	if err != nil {
+		if models.IsErrPollNotFound(err) {
+			ctx.NotFound("", nil)
+		} else {
+			ctx.ServerError("GetPollByRepoID", err)
+		}
+		return
+	}
+
+	poll.RenderedDescription = string(markdown.Render([]byte(poll.Description), ctx.Repo.RepoLink,
+		ctx.Repo.Repository.ComposeMetas()))
+
+	ctx.Data["Poll"] = poll
+	ctx.HTML(200, tplPollsView)
 }
 
 // EditPoll renders editing poll page

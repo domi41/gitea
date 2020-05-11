@@ -29,7 +29,7 @@ func (a PollCandidateResults) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 type PollResult struct {
 	Poll        *Poll
 	Tally       *PollTally
-	Candidates  []*PollCandidateResult
+	Candidates  PollCandidateResults
 	CreatedUnix timeutil.TimeStamp
 }
 
