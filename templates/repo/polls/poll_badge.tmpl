@@ -1,0 +1,53 @@
+{{/* A large label for polls' candidates. */}}
+{{/* No javascript for now.  There may be _some_. */}}
+{{/* .Poll : the Poll in question */}}
+{{/* .CandidateID : the Candidate */}}
+{{/* .Super : $ of parent template */}}
+{{ $pollResult := .Poll.GetResult }}
+{{/*{{ $candidateID := .Issue.Index }}*/}}
+{{ $candidateID := .CandidateID }}
+{{ $pollID := .Poll.ID }}
+{{ $pollCandidateResult := ($pollResult.GetCandidate $candidateID) }}
+{{ $medianColorWord := "grey" }}
+{{ if $pollCandidateResult }}
+{{ $medianColorWord = $pollCandidateResult.GetColorWord }}
+{{ end }}
+{{/*{{ $judgment := nil }}  ???  */}}
+{{ $judgment := "" }}
+{{ if $.Super.IsSigned }}
+{{ $judgment = (.Poll.GetJudgmentOnCandidate $.Super.SignedUser $candidateID) }}
+{{ end }}
+{{/*{{ $userGrade := nil }}*/}}
+{{ $userGrade := -1 }}
+{{ if $judgment }}
+{{ $userGrade = $judgment.Grade }}
+{{ end }}
+
+{{/* Wrapper for the :hover, old school */}}
+<div class="ui poll-badge" tabindex="0">
+
+	<div class="ui large label {{ $medianColorWord }}">
+		{{/* Oddly enough, this svg requires javascript.  Hmmm… */}}
+		{{ svg "octicon-law" 16 }}
+		{{ .Poll.Subject }}
+		{{ if $pollCandidateResult -}}
+			N°{{ $pollCandidateResult.Position }}
+		{{- end }}
+	</div>
+
+	{{ if $.Super.IsSigned }}
+	<div class="judgment-forms">
+		{{ range $grade, $icon := .Poll.GetGradationList }}
+			<form class="judgment-form {{ if (eq $grade $userGrade) }}selected{{ end }}" action="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/polls/{{ $pollID }}/judgments" method="post">
+				{{ $.Super.CsrfTokenHtml }}
+				<input type="hidden" name="redirect" value="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/issues/{{ $candidateID }}">
+				<input type="hidden" name="grade" value="{{ $grade }}">
+				<input type="hidden" name="candidate" value="{{ $candidateID }}">
+				<input class="emote" type="submit" value="{{ $icon }}">
+			</form>
+		{{ end }}
+	</div>
+	{{ end }}
+
+</div>
+
