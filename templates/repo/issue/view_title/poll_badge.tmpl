@@ -1,8 +1,17 @@
+{{/* A large label for polls' candidates. */}}
+{{/* No javascript for now.  There may be _some_. */}}
+{{/* .Poll : the Poll in question */}}
+{{/* .CandidateID : the Candidate */}}
+{{/* .Super : $ of parent template */}}
 {{ $pollResult := .Poll.GetResult }}
-{{ $candidateID := .Issue.Index }}
+{{/*{{ $candidateID := .Issue.Index }}*/}}
+{{ $candidateID := .CandidateID }}
 {{ $pollID := .Poll.ID }}
 {{ $pollCandidateResult := ($pollResult.GetCandidate $candidateID) }}
-{{ $medianColorWord := $pollCandidateResult.GetColorWord }}
+{{ $medianColorWord := "grey" }}
+{{ if $pollCandidateResult }}
+{{ $medianColorWord = $pollCandidateResult.GetColorWord }}
+{{ end }}
 {{/*{{ $judgment := nil }}  ???  */}}
 {{ $judgment := "" }}
 {{ if $.Super.IsSigned }}
@@ -18,11 +27,12 @@
 <div class="ui judgment-wrapper" tabindex="0">
 
 	<div class="ui large label {{ $medianColorWord }}">
+		{{/* Oddly enough, this svg requires javascript.  Hmmm… */}}
 		{{ svg "octicon-law" 16 }}
 		{{ .Poll.Subject }}
-		{{ if $pollCandidateResult }}
-		N°{{ $pollCandidateResult.Position }}
-		{{ end }}
+		{{ if $pollCandidateResult -}}
+			N°{{ $pollCandidateResult.Position }}
+		{{- end }}
 	</div>
 
 	{{ if $.Super.IsSigned }}

@@ -1,0 +1,51 @@
+{{ template "base/head" . }}
+
+<div class="repository polls">
+	{{ template "repo/header" . }}
+	<div class="ui container">
+		<div class="navbar">
+			{{ if and (or .CanWriteIssues .CanWritePulls) (not .Repository.IsArchived) }}
+				<div class="ui right">
+					<a class="ui green button" href="{{ $.Link }}/edit">{{ .i18n.Tr "repo.polls.edit" }}</a>
+				</div>
+			{{ end }}
+		</div>
+		<div class="ui divider"></div>
+		{{ template "base/alert" . }}
+
+		<div>
+			<h2>{{ .Poll.Subject }}</h2>
+
+			<div class="ui attached segment">
+				<div class="render-content markdown">
+					{{ if .Poll.RenderedDescription }}
+						{{ .Poll.RenderedDescription|Str2html }}
+					{{ else }}
+						<span class="no-content">{{ .i18n.Tr "repo.polls.no_description" }}</span>
+					{{ end }}
+				</div>
+			</div>
+		</div>
+
+		{{ $pollResult := .Poll.GetResult }}
+
+		<ul>
+
+			{{ range $key, $candidate := $pollResult.Candidates }}
+
+			<li>
+				N°{{ $candidate.Position }}
+				&mdash;
+				<a href="{{ $.AppSubUrl }}/{{ $.RepoRelPath }}/issues/{{ $candidate.CandidateID }}">
+					Issue
+					#{{ $candidate.CandidateID }}
+				</a>
+			</li>
+
+			{{ end }}
+		</ul>
+
+	</div>
+</div>
+
+{{ template "base/footer" . }}

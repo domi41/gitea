@@ -28,7 +28,7 @@
 	{{end}}
 
 	{{ range $poll := .Polls }}
-	{{ template "repo/issue/view_title/poll_badge" Dict "Issue" $.Issue "Poll" $poll "Super" $ }}
+	{{ template "repo/issue/view_title/poll_badge" Dict "Poll" $poll "CandidateID" $.Issue.Index "Super" $ }}
 	{{ end }}
 
 	{{if .Issue.IsPull}}
