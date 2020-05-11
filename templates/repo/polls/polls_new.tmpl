@@ -2,15 +2,6 @@
 <div class="repository new poll">
 	{{template "repo/header" .}}
 	<div class="ui container">
-		<div class="navbar">
-{{/*			{{template "repo/poll/navbar" .}}*/}}
-			{{if and (or .CanWriteIssues .CanWritePulls) .PageIsEditPoll}}
-				<div class="ui right floated secondary menu">
-					<a class="ui green button" href="{{$.RepoLink}}/polls/new">{{.i18n.Tr "repo.polls.new"}}</a>
-				</div>
-			{{end}}
-		</div>
-		<div class="ui divider"></div>
 		<h2 class="ui dividing header">
 			{{if .PageIsEditPoll}}
 				{{.i18n.Tr "repo.polls.edit"}}
@@ -27,7 +18,8 @@
 				<div class="field {{if .Err_Title}}error{{end}}">
 					{{/* form_poll_subject or form-poll-subject ? */}}
 					<label for="form_poll_subject">{{.i18n.Tr "repo.polls.subject.label"}}</label>
-					<input id="form_poll_subject" name="subject" placeholder="{{.i18n.Tr "repo.polls.subject.placeholder"}}"
+					<input id="form_poll_subject" name="subject"
+						   placeholder="{{.i18n.Tr "repo.polls.subject.placeholder"}}"
 						   value="{{.subject}}" autofocus required maxlength="128">
 				</div>
 				<div class="field">
@@ -40,6 +32,26 @@
 						<option value="emote6-0" selected>😫 😒 😐 😌 😀 😍</option>
 						<option value="emote6-1">🤮 😒 😐 🙂 😀 🤩</option>
 					</select>
+				</div>
+				<div class="field disabled">
+					<label>{{ .i18n.Tr "repo.polls.candidates.label" }}</label>
+					<label>
+						<input type="radio" name="candidates_pool" value="issues_merges" checked>
+						{{ .i18n.Tr "repo.polls.candidates.pool.issues_merges" }}
+					</label>
+					<label>
+						<input type="radio" name="candidates_pool" value="issues">
+						{{ .i18n.Tr "repo.polls.candidates.pool.issues" }}
+					</label>
+					<label>
+						<input type="radio" name="candidates_pool" value="merges">
+						{{ .i18n.Tr "repo.polls.candidates.pool.merges" }}
+					</label>
+					<label>
+						<input type="radio" name="candidates_pool" value="indices">
+						{{ .i18n.Tr "repo.polls.candidates.pool.indices" }}
+						<input class="inline-input" type="text" name="candidates_pool_indices" title="{{ .i18n.Tr "repo.polls.candidates.pool.indices.help" }}" placeholder="1, 9, 12">
+					</label>
 				</div>
 			</div>
 
