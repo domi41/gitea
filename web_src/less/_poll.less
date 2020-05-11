@@ -1,0 +1,125 @@
+
+//  ____       _ _
+// |  _ \ ___ | | |___
+// | |_) / _ \| | / __|
+// |  __/ (_) | | \__ \
+// |_|   \___/|_|_|___/
+//
+
+
+/* Emote Support */
+.emote {
+    font-family: "Source Code Pro", Consolas, monaco, monospace !important;
+}
+
+
+//  _____                    _
+// |_   _|_      _____  __ _| | _____
+//   | | \ \ /\ / / _ \/ _` | |/ / __|
+//   | |  \ V  V /  __/ (_| |   <\__ \
+//   |_|   \_/\_/ \___|\__,_|_|\_\___/
+//
+
+.ui.label {
+    padding-top:    0.6em;
+    padding-bottom: 0.6em;
+}
+
+
+//  ____       _ _   ____            _
+// |  _ \ ___ | | | | __ )  __ _  __| | __ _  ___
+// | |_) / _ \| | | |  _ \ / _` |/ _` |/ _` |/ _ \
+// |  __/ (_) | | | | |_) | (_| | (_| | (_| |  __/
+// |_|   \___/|_|_| |____/ \__,_|\__,_|\__, |\___|
+//                                     |___/
+
+.poll-badge {
+    display: inline-block;
+    /* Otherwise the h1 blocks a portion of the label's hover area */
+    position: relative;
+    z-index: 1;
+    /***************************************************************/
+}
+
+.poll-badge:focus-within .judgment-forms,
+.poll-badge:focus        .judgment-forms,
+.poll-badge:hover        .judgment-forms {
+    display: inline-block;
+    left: -9px;
+    opacity: 1.0;
+}
+
+.judgment-forms {
+    display: none;
+    vertical-align: middle;
+    position: relative;
+    top: 0;
+    left: -90px; /* keep as fallback */
+    opacity: 0.0; /* keep as fallback */
+    animation: fade_in_judgment_forms 0.4s ease-out;
+    /*transition: left 0.4s ease-out 0s, opacity 0.3s ease-out 0s;*/
+}
+
+/* Since transitions won't play with a change of display, we use animation */
+@keyframes fade_in_judgment_forms {
+    0% {
+        pointer-events: none;
+        opacity: 0;
+        left: -150px;
+        transform: scale(0.2);
+    }
+    95% {
+        transform: scale(1.0);
+    }
+    99% {
+        pointer-events: none;
+    }
+    100% {
+        pointer-events: initial;
+        opacity: 1;
+        left: -9px;
+    }
+}
+
+.judgment-form {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.judgment-form input.emote {
+    font-size: 1.618em;
+    width: 1.818rem;
+    height: 1.918rem;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: none;
+    transition: 0.3s filter, 0.2s transform;
+    cursor: pointer;
+
+}
+
+.judgment-form:not(.selected) input.emote {
+    filter: grayscale(1.0);
+}
+
+.judgment-form.selected:focus-within::after,
+.judgment-form.selected:hover::after {
+    color: darkred;
+    position: absolute;
+    content: "×";
+    top: 0.11em;
+    left: 0.19em;
+    font-size: 2em;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.judgment-form input.emote:hover,
+.judgment-form input.emote:focus {
+    background: none;
+    filter: grayscale(0.0);
+    transform: scale(1.1);
+}
