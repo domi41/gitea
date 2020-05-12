@@ -25,6 +25,7 @@ export function initNotificationCount() {
     return;
   }
 
+  NotificationSettings.EventSourceUpdateTime = 0; // hotfix for 60s /user/events, clear me when fixed
   if (NotificationSettings.EventSourceUpdateTime > 0 && !!window.EventSource) {
     // Try to connect to the event source first
     const source = new EventSource(`${AppSubUrl}/user/events`);
