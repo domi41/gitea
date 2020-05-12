@@ -59,8 +59,7 @@ func NewPoll(ctx *context.Context) {
 // NewPollPost processes the "new poll" form and redirects
 func NewPollPost(ctx *context.Context, form auth.CreatePollForm) {
 	ctx.Data["Title"] = ctx.Tr("repo.polls.new")
-	//ctx.Data["DateLang"] = setting.DateLang(ctx.Locale.Language())
-
+	ctx.Data["PageIsPolls"] = true
 	if ctx.HasError() {
 		ctx.HTML(200, tplPollsNew)
 		return
@@ -76,16 +75,17 @@ func NewPollPost(ctx *context.Context, form auth.CreatePollForm) {
 		return
 	}
 
-	ctx.Flash.Success(ctx.Tr("repo.polls.create_success", form.Subject))
+	ctx.Flash.Success(ctx.Tr("repo.polls.create.success", form.Subject))
 	ctx.Redirect(ctx.Repo.RepoLink + "/polls")
 }
 
 // ViewPoll renders display poll page
 func ViewPoll(ctx *context.Context) {
 	ctx.Data["Title"] = ctx.Tr("repo.polls.view")
+	ctx.Data["PageIsPolls"] = true
 
 	poll, err := models.GetPollByRepoID(ctx.Repo.Repository.ID, ctx.ParamsInt64(":id"))
-	if err != nil {
+	if nil != err {
 		if models.IsErrPollNotFound(err) {
 			ctx.NotFound("", nil)
 		} else {
@@ -109,7 +109,7 @@ func EditPoll(ctx *context.Context) {
 	//ctx.Data["DateLang"] = setting.DateLang(ctx.Locale.Language())
 
 	m, err := models.GetPollByRepoID(ctx.Repo.Repository.ID, ctx.ParamsInt64(":id"))
-	if err != nil {
+	if nil != err {
 		if models.IsErrPollNotFound(err) {
 			ctx.NotFound("", nil)
 		} else {
@@ -125,7 +125,7 @@ func EditPoll(ctx *context.Context) {
 // EditPollPost response for edting poll
 func EditPollPost(ctx *context.Context, form auth.CreatePollForm) {
 	ctx.Data["Title"] = ctx.Tr("repo.polls.edit")
-	//ctx.Data["PageIsPolls"] = true
+	ctx.Data["PageIsPolls"] = true
 	ctx.Data["PageIsEditPoll"] = true
 	//ctx.Data["DateLang"] = setting.DateLang(ctx.Locale.Language())
 
@@ -163,7 +163,7 @@ func EditPollPost(ctx *context.Context, form auth.CreatePollForm) {
 		return
 	}
 
-	ctx.Flash.Success(ctx.Tr("repo.polls.edit_success", m.Subject))
+	ctx.Flash.Success(ctx.Tr("repo.polls.edit.success", m.Subject))
 	ctx.Redirect(ctx.Repo.RepoLink + "/polls")
 }
 
@@ -172,7 +172,7 @@ func DeletePoll(ctx *context.Context) {
 	if err := models.DeletePollByRepoID(ctx.Repo.Repository.ID, ctx.ParamsInt64(":id")); err != nil {
 		ctx.Flash.Error("DeletePollByRepoID: " + err.Error())
 	} else {
-		ctx.Flash.Success(ctx.Tr("repo.polls.deletion_success"))
+		ctx.Flash.Success(ctx.Tr("repo.polls.delete.success"))
 	}
 
 	ctx.JSON(200, map[string]interface{}{
