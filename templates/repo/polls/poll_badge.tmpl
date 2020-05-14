@@ -38,7 +38,7 @@
 	{{ if $.Super.IsSigned }}
 	<div class="judgment-forms">
 		{{ range $grade, $icon := .Poll.GetGradationList }}
-			<form class="judgment-form {{ if (eq $grade $userGrade) }}selected{{ end }}" action="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/polls/{{ $pollID }}/judgments" method="post">
+			<form class="judgment-form{{ if (eq $grade $userGrade) }} selected{{ end }}" action="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/polls/{{ $pollID }}/judgments" method="post">
 				{{ $.Super.CsrfTokenHtml }}
 				<input type="hidden" name="redirect" value="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/issues/{{ $candidateID }}">
 				<input type="hidden" name="grade" value="{{ $grade }}">
