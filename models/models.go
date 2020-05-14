@@ -126,7 +126,7 @@ func init() {
 		new(LanguageStat),
 		new(EmailHash),
 		new(Poll),
-		new(Judgment),
+		new(PollJudgment),
 	)
 
 	gonicNames := []string{"SSL", "UID"}

@@ -17,7 +17,7 @@ import (
 )
 
 type CreateJudgmentResponse struct {
-	Judgment *models.Judgment
+	Judgment *models.PollJudgment
 }
 
 // Creates, Updates or Deletes a Judgment depending on the parameters

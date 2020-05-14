@@ -42,7 +42,7 @@ type Poll struct {
 	ClosedUnix   timeutil.TimeStamp `xorm:"INDEX"`
 
 	// No idea how xorm works -- help!
-	//Judgments         []*Judgment    `xorm:"-"`
+	//Judgments         []*PollJudgment    `xorm:"-"`
 	//Judgments         JudgmentList   `xorm:"-"`
 }
 
@@ -68,17 +68,17 @@ func (poll *Poll) GetGradationList() []string {
 
 func (poll *Poll) GetCandidatesIDs() (_ []int64, err error) {
 	ids := make([]int64, 0, 10)
-	if err := x.Table("judgment").
-		Select("DISTINCT candidate_id").
-		Where("poll_id = ?", poll.ID).
-		OrderBy("candidate_id asc").
+	if err := x.Table("poll_judgment").
+		Select("DISTINCT `poll_judgment`.`candidate_id`").
+		Where("`poll_judgment`.`poll_id` = ?", poll.ID).
+		OrderBy("`poll_judgment`.`candidate_id` ASC").
 		Find(&ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
-func (poll *Poll) GetJudgmentOnCandidate(judge *User, candidateID int64) (judgmernt *Judgment) {
+func (poll *Poll) GetJudgmentOnCandidate(judge *User, candidateID int64) (judgmernt *PollJudgment) {
 	judgment, err := getJudgmentOfJudgeOnPollCandidate(x, judge.ID, poll.ID, candidateID)
 	if nil != err {
 		return nil
@@ -105,11 +105,11 @@ func (poll *Poll) GetResult() (results *PollResult) {
 func (poll *Poll) CountGrades(candidateID int64, grade uint8) (_ uint64, err error) {
 	rows := make([]int64, 0, 2)
 
-	if err := x.Table("judgment").
+	if err := x.Table("poll_judgment").
 		Select("COUNT(*) as amount").
-		Where("poll_id = ?", poll.ID).
-		And("candidate_id = ?", candidateID).
-		And("grade = ?", grade).
+		Where("`poll_judgment`.`poll_id` = ?", poll.ID).
+		And("`poll_judgment`.`candidate_id` = ?", candidateID).
+		And("`poll_judgment`.`grade` = ?", grade).
 		// Use Get() perhaps?
 		Find(&rows); err != nil {
 		return 0, err
@@ -204,7 +204,7 @@ func GetPolls(repoID int64, page int) (PollList, error) {
 
 func getPollByRepoID(e Engine, repoID, id int64) (*Poll, error) {
 	m := new(Poll)
-	has, err := e.ID(id).Where("repo_id=?", repoID).Get(m)
+	has, err := e.ID(id).Where("repo_id = ?", repoID).Get(m)
 	if err != nil {
 		return nil, err
 	} else if !has {
