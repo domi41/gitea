@@ -15,7 +15,7 @@ import (
 )
 
 // A Judgment on a Poll
-type Judgment struct {
+type PollJudgment struct {
 	ID      int64 `xorm:"pk autoincr"`
 	PollID  int64 `xorm:"INDEX UNIQUE(poll_judge_candidate)"`
 	Poll    *Poll `xorm:"-"`
@@ -58,7 +58,7 @@ type DeleteJudgmentOptions struct {
 	CandidateID int64
 }
 
-func CreateJudgment(opts *CreateJudgmentOptions) (judgment *Judgment, err error) {
+func CreateJudgment(opts *CreateJudgmentOptions) (judgment *PollJudgment, err error) {
 	sess := x.NewSession()
 	defer sess.Close()
 	if err = sess.Begin(); err != nil {
@@ -77,8 +77,8 @@ func CreateJudgment(opts *CreateJudgmentOptions) (judgment *Judgment, err error)
 	return judgment, nil
 }
 
-func createJudgment(e *xorm.Session, opts *CreateJudgmentOptions) (_ *Judgment, err error) {
-	judgment := &Judgment{
+func createJudgment(e *xorm.Session, opts *CreateJudgmentOptions) (_ *PollJudgment, err error) {
+	judgment := &PollJudgment{
 		PollID:      opts.Poll.ID,
 		Poll:        opts.Poll,
 		JudgeID:     opts.Judge.ID,
@@ -98,8 +98,8 @@ func createJudgment(e *xorm.Session, opts *CreateJudgmentOptions) (_ *Judgment, 
 	return judgment, nil
 }
 
-func getJudgmentByID(e Engine, id int64) (*Judgment, error) {
-	repo := new(Judgment)
+func getJudgmentByID(e Engine, id int64) (*PollJudgment, error) {
+	repo := new(PollJudgment)
 	has, err := e.ID(id).Get(repo)
 	if err != nil {
 		return nil, err
@@ -109,15 +109,15 @@ func getJudgmentByID(e Engine, id int64) (*Judgment, error) {
 	return repo, nil
 }
 
-func getJudgmentOfJudgeOnPollCandidate(e Engine, judgeID int64, pollID int64, candidateID int64) (judgment *Judgment, err error) {
+func getJudgmentOfJudgeOnPollCandidate(e Engine, judgeID int64, pollID int64, candidateID int64) (judgment *PollJudgment, err error) {
 	// We could probably use only one SQL query instead of two here.
 	// No idea how this ORM works, and sprinting past it with snippet copy-pasting.
 	judgmentsIds := make([]int64, 0, 1)
-	if err = e.Table("judgment").
+	if err = e.Table("poll_judgment").
 		Cols("id").
-		Where("`judgment`.judge_id = ?", judgeID).
-		And("`judgment`.poll_id = ?", pollID).
-		And("`judgment`.candidate_id = ?", candidateID).
+		Where("`poll_judgment`.`judge_id` = ?", judgeID).
+		And("`poll_judgment`.`poll_id` = ?", pollID).
+		And("`poll_judgment`.`candidate_id` = ?", candidateID).
 		Limit(1). // perhaps .Get() is what we need here?
 		Find(&judgmentsIds); err != nil {
 		return nil, fmt.Errorf("find judgment: %v", err)
@@ -135,7 +135,7 @@ func getJudgmentOfJudgeOnPollCandidate(e Engine, judgeID int64, pollID int64, ca
 	return judgment, nil
 }
 
-func UpdateJudgment(opts *UpdateJudgmentOptions) (judgment *Judgment, err error) {
+func UpdateJudgment(opts *UpdateJudgmentOptions) (judgment *PollJudgment, err error) {
 	sess := x.NewSession()
 	defer sess.Close()
 	if err = sess.Begin(); err != nil {

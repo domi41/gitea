@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJudgment_Create(t *testing.T) {
+func TestPollJudgment_Create(t *testing.T) {
 	assert.NoError(t, PrepareTestDatabase())
 	repo := AssertExistsAndLoadBean(t, &Repository{ID: 2}).(*Repository)
 	user := AssertExistsAndLoadBean(t, &User{ID: 2}).(*User)
