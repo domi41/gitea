@@ -109,7 +109,6 @@ func (deli *PollNaiveDeliberator) GetScore(pct *PollCandidateTally) (_ string) {
 		ct.RegradeJudgments(medianGrade, groupGrade)
 	}
 
-	//println("Score: " + score)
 	return score
 }
 
