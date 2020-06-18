@@ -33,12 +33,13 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 		return nil, err
 	}
 
+	// Consider missing judgments as TO_REJECT judgments
 	for _, candidateTally := range pollTally.Candidates {
-		theLost := pollTally.MaxJudgmentsAmount - candidateTally.JudgmentsAmount
-		if 0 < theLost {
+		missing := pollTally.MaxJudgmentsAmount - candidateTally.JudgmentsAmount
+		if 0 < missing {
 			candidateTally.JudgmentsAmount = pollTally.MaxJudgmentsAmount
-			candidateTally.Grades[0].Amount += theLost
-			//println("Added the lost judgments", theLost)
+			candidateTally.Grades[0].Amount += missing
+			//println("Added the lost judgments", missing)
 		}
 	}
 
