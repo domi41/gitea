@@ -31,7 +31,7 @@ type PollCandidateGradeTally struct {
 type PollCandidateTally struct {
 	Poll            *Poll
 	CandidateID     int64                      // Issue Index (or internal candidate index, later on)
-	Grades          []*PollCandidateGradeTally // Sorted by grade
+	Grades          []*PollCandidateGradeTally // Sorted by grade (0 == REJECT)
 	JudgmentsAmount uint64
 	CreatedUnix     timeutil.TimeStamp
 }
