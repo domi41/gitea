@@ -36,7 +36,7 @@ In this SVG, the ViewBox centers the (0.0), and both axes go from -1 to 1
 	{{/* (L)ine x y */}}
 	<path
 			d="M {{$exterior.Start.X}} {{$exterior.Start.Y}} A {{ $exterior_radius }} {{ $exterior_radius }} 0 {{ $large_flag }} 1 {{$exterior.End.X}} {{$exterior.End.Y}} L {{$interior.End.X}} {{$interior.End.Y}} A {{ $interior_radius }} {{ $interior_radius }} 0 {{ $large_flag }} 0 {{$interior.Start.X}} {{$interior.Start.Y}}"
-			fill="{{$color}}"
+			fill="{{ $color }}"
 	></path>
 {{ end }}
 
@@ -51,14 +51,14 @@ In this SVG, the ViewBox centers the (0.0), and both axes go from -1 to 1
 	{{ $color := "#FFFFFF" }}
 	<path
 			d="M {{$exterior.End.X}} {{$exterior.End.Y}} L {{$interior.End.X}} {{$interior.End.Y}}"
-			stroke="{{$color}}"
-			stroke-width="{{$delimiter}}"
+			stroke="{{ $color }}"
+			stroke-width="{{ $delimiter }}"
 	></path>
 	{{ if eq $grade_id 0 }}
 	<path
 			d="M {{$exterior.Start.X}} {{$exterior.Start.Y}} L {{$interior.Start.X}} {{$interior.Start.Y}}"
-			stroke="{{$color}}"
-			stroke-width="{{$delimiter}}"
+			stroke="{{ $color }}"
+			stroke-width="{{ $delimiter }}"
 	></path>
 	{{ end }}
 {{ end }}
