@@ -42,6 +42,8 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.Len(t, result.Candidates, 0)
 
 	// Add a Judgment from Ali
+	// Candidate 1 : SOMEWHAT_GOOD
+	// Candidate 2 :
 
 	judgment, err := CreateJudgment(&CreateJudgmentOptions{
 		Judge:       userAli,
@@ -60,6 +62,8 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.Len(t, result.Candidates, 1)
 
 	// Add a judgment from Bob
+	// Candidate 1 : PASSABLE SOMEWHAT_GOOD
+	// Candidate 2 :
 
 	judgment, err = CreateJudgment(&CreateJudgmentOptions{
 		Judge:       userBob,
@@ -79,6 +83,8 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.Equal(t, uint64(1), result.Candidates[0].Position)
 
 	// Add another judgment from Bob
+	// Candidate 1 : PASSABLE SOMEWHAT_GOOD
+	// Candidate 2 : GOOD
 
 	judgment, err = CreateJudgment(&CreateJudgmentOptions{
 		Judge:       userBob,
@@ -102,6 +108,8 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.Equal(t, uint8(0), result.Candidates[1].MedianGrade)
 
 	// Add another 2 judgments from Cho and one from Ali
+	// Candidate 1 : PASSABLE SOMEWHAT_GOOD GOOD
+	// Candidate 2 : SOMEWHAT_GOOD SOMEWHAT_GOOD GOOD
 
 	judgment, err = CreateJudgment(&CreateJudgmentOptions{
 		Judge:       userCho,
@@ -142,5 +150,13 @@ func TestNaiveDeliberator(t *testing.T) {
 	//println("C1", result.Candidates[1].MedianGrade)
 	assert.Equal(t, uint8(3), result.Candidates[0].MedianGrade)
 	assert.Equal(t, uint8(3), result.Candidates[1].MedianGrade)
+
+	for i := 0; i < 5; i++ {
+		println("Tally.Grades[", i, "].Amount", result.Candidates[0].Tally.Grades[i].Amount)
+	}
+
+	assert.Equal(t, uint64(1), result.Candidates[0].Tally.Grades[4].Amount)
+	assert.Equal(t, uint64(1), result.Candidates[1].Tally.Grades[4].Amount)
+	assert.Equal(t, uint64(2), result.Candidates[1].Tally.Grades[3].Amount)
 
 }
