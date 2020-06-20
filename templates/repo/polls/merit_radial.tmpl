@@ -1,17 +1,24 @@
 {{ $merit := . }}
-{{/* Radial representation of a merit profile */}}
-{{/* In this SVG, the ViewBox centers the (0.0), and both axes go from -1 to 1 */}}
 
-{{ $size := 32 }}{{/* in pixels */}}
-{{ $delimiter := 0.04 }}
-{{ $half_gap := 0.38 }}{{/* ~asin(GOLDEN_RATIO-1) */}}
-{{ $half_rest := 2.7616 }}{{/* MUST BE (PI - half_gap) ARITHMETIC IS 404 */}}
-{{ $exterior_radius := 0.9167 }}
-{{ $interior_radius := 0.3501 }}{{/* exterior_radius/GOLD */}}
+{{/*
+
+Radial representation of a merit profile.
+The $merit above is an instance of PollCandidateMeritProfile.
+In this SVG, the ViewBox centers the (0.0), and both axes go from -1 to 1
+
+*/}}
+
+{{ $size := 32 }}{{/* size of the SVG (pixels) */}}
+{{ $delimiter := 0.04 }}{{/* breadth of the white line between grades (viewbox referential) */}}
+{{ $half_gap := 0.38 }}{{/* ~asin(GOLDEN_RATIO-1) adjusted for the delimiter - (radians) */}}
+{{ $half_rest := 2.7616 }}{{/* MUST BE (PI - $half_gap) ARITHMETIC IS 404 - (radians) */}}
+{{ $exterior_radius := 0.9167 }}{{/* About 11/12 to leave some padding (viewbox referential) */}}
+{{ $interior_radius := 0.3501 }}{{/* exterior_radius/GOLDEN_RATIO (viewbox referential) */}}
+
 <svg
 		style="transform: rotate(0.25turn);"
-		width="{{$size}}px"
-		height="{{$size}}px"
+		width="{{ $size }}px"
+		height="{{ $size }}px"
 		{{/* min_x, min_y, width, height */}}
 		viewBox="-1 -1 2 2"
 >
@@ -19,9 +26,8 @@
 	{{ $angle := $merit.GetGradeAngle $grade_id $half_gap }}
 	{{ $exterior := $merit.GetCirclePoints $grade_id $exterior_radius $half_gap }}
 	{{ $interior := $merit.GetCirclePoints $grade_id $interior_radius $half_gap }}
-	{{ $large := gt $angle $half_rest }}
 	{{ $large_flag := 0 }}
-	{{ if $large }}
+	{{ if gt $angle $half_rest }}
 		{{ $large_flag = 1 }}
 	{{ end }}
 	{{ $color := $merit.GetColorCode $grade_id }}
