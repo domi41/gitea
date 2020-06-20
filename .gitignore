@@ -45,6 +45,7 @@ coverage.all
 
 /gitea
 /gitea-vet
+/gitea-repositories
 /debug
 /integrations.test
 
