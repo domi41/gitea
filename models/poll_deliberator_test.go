@@ -151,12 +151,9 @@ func TestNaiveDeliberator(t *testing.T) {
 	assert.Equal(t, uint8(3), result.Candidates[0].MedianGrade)
 	assert.Equal(t, uint8(3), result.Candidates[1].MedianGrade)
 
-	for i := 0; i < 5; i++ {
-		println("Tally.Grades[", i, "].Amount", result.Candidates[0].Tally.Grades[i].Amount)
-	}
-
 	assert.Equal(t, uint64(1), result.Candidates[0].Tally.Grades[4].Amount)
+	assert.Equal(t, uint64(2), result.Candidates[0].Tally.Grades[3].Amount)
+	assert.Equal(t, uint64(1), result.Candidates[1].Tally.Grades[2].Amount)
+	assert.Equal(t, uint64(1), result.Candidates[1].Tally.Grades[3].Amount)
 	assert.Equal(t, uint64(1), result.Candidates[1].Tally.Grades[4].Amount)
-	assert.Equal(t, uint64(2), result.Candidates[1].Tally.Grades[3].Amount)
-
 }
