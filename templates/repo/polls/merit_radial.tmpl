@@ -1,0 +1,59 @@
+{{ $merit := . }}
+{{/* Radial representation of a merit profile */}}
+{{/* In this SVG, the ViewBox centers the (0.0), and both axes go from -1 to 1 */}}
+
+{{ $size := 32 }}{{/* in pixels */}}
+{{ $delimiter := 0.04 }}
+{{ $half_gap := 0.38 }}{{/* ~asin(GOLDEN_RATIO-1) */}}
+{{ $half_rest := 2.7616 }}{{/* MUST BE (PI - half_gap) ARITHMETIC IS 404 */}}
+{{ $exterior_radius := 0.9167 }}
+{{ $interior_radius := 0.3501 }}{{/* exterior_radius/GOLD */}}
+<svg
+		style="transform: rotate(0.25turn);"
+		width="{{$size}}px"
+		height="{{$size}}px"
+		{{/* min_x, min_y, width, height */}}
+		viewBox="-1 -1 2 2"
+>
+{{ range $grade_id, $amount := .Grades }}
+	{{ $angle := $merit.GetGradeAngle $grade_id $half_gap }}
+	{{ $exterior := $merit.GetCirclePoints $grade_id $exterior_radius $half_gap }}
+	{{ $interior := $merit.GetCirclePoints $grade_id $interior_radius $half_gap }}
+	{{ $large := gt $angle $half_rest }}
+	{{ $large_flag := 0 }}
+	{{ if $large }}
+		{{ $large_flag = 1 }}
+	{{ end }}
+	{{ $color := $merit.GetColorCode $grade_id }}
+	{{/* (M)ove x y */}}
+	{{/* (A)rc rx ry x-axis-rotation large-arc-flag sweep-flag x y */}}
+	{{/* (L)ine x y */}}
+	<path
+			d="M {{$exterior.Start.X}} {{$exterior.Start.Y}} A {{ $exterior_radius }} {{ $exterior_radius }} 0 {{ $large_flag }} 1 {{$exterior.End.X}} {{$exterior.End.Y}} L {{$interior.End.X}} {{$interior.End.Y}} A {{ $interior_radius }} {{ $interior_radius }} 0 {{ $large_flag }} 0 {{$interior.Start.X}} {{$interior.Start.Y}}"
+			fill="{{$color}}"
+	></path>
+{{ end }}
+
+{{/* Draw white delimiters between grades, for accessibility */}}
+{{/* As a second pass. (you know what they say about premature optimizations) */}}
+{{/* If we can do this all in one pass, by resizing the arcs, it's faster. */}}
+{{/* Keep in mind that in that case we'd need a background color. */}}
+{{/* We need a background color anyways, at least a white padding. */}}
+{{ range $grade_id, $amount := .Grades }}
+	{{ $exterior := $merit.GetCirclePoints $grade_id $exterior_radius $half_gap }}
+	{{ $interior := $merit.GetCirclePoints $grade_id $interior_radius $half_gap }}
+	{{ $color := "#FFFFFF" }}
+	<path
+			d="M {{$exterior.End.X}} {{$exterior.End.Y}} L {{$interior.End.X}} {{$interior.End.Y}}"
+			stroke="{{$color}}"
+			stroke-width="{{$delimiter}}"
+	></path>
+	{{ if eq $grade_id 0 }}
+	<path
+			d="M {{$exterior.Start.X}} {{$exterior.Start.Y}} L {{$interior.Start.X}} {{$interior.Start.Y}}"
+			stroke="{{$color}}"
+			stroke-width="{{$delimiter}}"
+	></path>
+	{{ end }}
+{{ end }}
+</svg>

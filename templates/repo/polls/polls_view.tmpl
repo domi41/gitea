@@ -27,15 +27,26 @@
 			</div>
 		</div>
 
+		{{/* Move these away once they're stable */}}
+		<style>
+			ul.candidates.list li {
+				display: flex;
+				align-items: center; /* align vertically */
+			}
+		</style>
+
 		{{ $pollResult := .Poll.GetResult }}
 
-		<ul>
+		<ul class="candidates issue list">
 
 			{{ range $key, $candidate := $pollResult.Candidates }}
 
-			<li>
+			<li class="item">
+				{{ template "repo/polls/merit_radial" $candidate.MeritProfile }}
+				&nbsp;
 				N°{{ $candidate.Position }}
 				&mdash;
+				&nbsp;
 				<a href="{{ $.AppSubUrl }}/{{ $.RepoRelPath }}/issues/{{ $candidate.CandidateID }}">
 					Issue
 					#{{ $candidate.CandidateID }}

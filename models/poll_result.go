@@ -10,13 +10,14 @@ import (
 )
 
 type PollCandidateResult struct {
-	Poll        *Poll
-	CandidateID int64  // Issue Index (or internal candidate index, later on)
-	Position    uint64 // Two Candidates may share the same Position (perfect equality)
-	MedianGrade uint8
-	Score       string
-	Tally       *PollCandidateTally
-	CreatedUnix timeutil.TimeStamp
+	Poll         *Poll
+	CandidateID  int64  // Issue Index (or internal candidate index, later on)
+	Position     uint64 // Two Candidates may share the same Position (perfect equality)
+	MedianGrade  uint8
+	Score        string
+	Tally        *PollCandidateTally
+	MeritProfile *PollCandidateMeritProfile
+	CreatedUnix  timeutil.TimeStamp
 }
 
 // PollCandidateResults implements sort.Interface based on the Score field.
@@ -43,20 +44,5 @@ func (result *PollResult) GetCandidate(candidateID int64) (_ *PollCandidateResul
 }
 
 func (result *PollCandidateResult) GetColorWord() (_ string) {
-	switch result.MedianGrade {
-	case 0:
-		return "red"
-	case 1:
-		return "red"
-	case 2:
-		return "orange"
-	case 3:
-		return "yellow"
-	case 4:
-		return "olive"
-	case 5:
-		return "green"
-	default:
-		return "green"
-	}
+	return result.Poll.GetGradeColorWord(result.MedianGrade)
 }

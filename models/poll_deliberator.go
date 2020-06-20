@@ -34,6 +34,7 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 	}
 
 	// Consider missing judgments as TO_REJECT judgments
+	// One reason why we need many algorithms, and options on each
 	for _, candidateTally := range pollTally.Candidates {
 		missing := pollTally.MaxJudgmentsAmount - candidateTally.JudgmentsAmount
 		if 0 < missing {
@@ -43,22 +44,41 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 		}
 	}
 
+	amountOfGrades := len(poll.GetGradationList())
 	candidates := make(PollCandidateResults, 0, 64)
+	creationTime := timeutil.TimeStampNow()
 
 	for _, candidateTally := range pollTally.Candidates {
 
 		medianGrade := candidateTally.GetMedian()
-		//candidateScore := candidateTally.GetScore()
 		candidateScore := deli.GetScore(candidateTally)
 
+		gradesProfile := make([]uint64, 0, amountOfGrades)
+		for i := 0; i < amountOfGrades; i++ {
+			gradesProfile = append(gradesProfile, candidateTally.Grades[i].Amount)
+			//gradesProfile = append(gradesProfile, uint64(i+1))
+		}
+
+		meritProfile := &PollCandidateMeritProfile{
+			Poll:            poll,
+			CandidateID:     candidateTally.CandidateID,
+			Position:        0, // see below
+			Grades:          gradesProfile,
+			JudgmentsAmount: candidateTally.JudgmentsAmount,
+			//JudgmentsAmount: (6+1)*3,
+			//HalfJudgmentsAmount: candidateTally.JudgmentsAmount / 2,
+			CreatedUnix: creationTime,
+		}
+
 		candidates = append(candidates, &PollCandidateResult{
-			Poll:        poll,
-			CandidateID: candidateTally.CandidateID,
-			Position:    0, // We set it below after the Sort
-			MedianGrade: medianGrade,
-			Score:       candidateScore,
-			Tally:       candidateTally,
-			CreatedUnix: timeutil.TimeStampNow(),
+			Poll:         poll,
+			CandidateID:  candidateTally.CandidateID,
+			Position:     0, // We set it below after the Sort on Score
+			MedianGrade:  medianGrade,
+			Score:        candidateScore,
+			Tally:        candidateTally,
+			MeritProfile: meritProfile,
+			CreatedUnix:  creationTime,
 		})
 
 	}
@@ -72,6 +92,7 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 			position = candidates[key-1].Position
 		}
 		candidate.Position = position
+		candidate.MeritProfile.Position = position
 		previousScore = candidate.Score
 	}
 

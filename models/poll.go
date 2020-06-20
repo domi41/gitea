@@ -66,6 +66,48 @@ func (poll *Poll) GetGradationList() []string {
 	return list
 }
 
+func (poll *Poll) GetGradeColorWord(grade uint8) (_ string) {
+	// Another placeholder, bypassing the dragon for now
+	switch grade {
+	case 0:
+		return "red"
+	case 1:
+		return "red"
+	case 2:
+		return "orange"
+	case 3:
+		return "yellow"
+	case 4:
+		return "olive"
+	case 5:
+		return "green"
+	default:
+		return "green"
+	}
+}
+
+func (poll *Poll) GetGradeColorCode(grade uint8) (_ string) {
+	// Another placeholder, bypassing the dragon for now
+	switch grade {
+	case 0:
+		return "#E0361C"
+	case 1:
+		return "#EE6E00"
+	case 2:
+		return "#FDB200"
+	case 3:
+		return "#C6D700"
+	case 4:
+		return "#7EC239"
+	case 5:
+		return "#02AB58"
+	case 6:
+		return "#007E3D"
+	default:
+		return "#007E3D"
+	}
+}
+
 func (poll *Poll) GetCandidatesIDs() (_ []int64, err error) {
 	ids := make([]int64, 0, 10)
 	if err := x.Table("poll_judgment").
