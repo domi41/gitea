@@ -40,7 +40,7 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 		if 0 < missing {
 			candidateTally.JudgmentsAmount = pollTally.MaxJudgmentsAmount
 			candidateTally.Grades[0].Amount += missing
-			//println("Added the lost judgments", missing)
+			//println("Added the missing TO REJECT judgments", missing)
 		}
 	}
 
@@ -66,7 +66,6 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 			Grades:          gradesProfile,
 			JudgmentsAmount: candidateTally.JudgmentsAmount,
 			//JudgmentsAmount: (6+1)*3,
-			//HalfJudgmentsAmount: candidateTally.JudgmentsAmount / 2,
 			CreatedUnix: creationTime,
 		}
 
@@ -116,11 +115,9 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 func (deli *PollNaiveDeliberator) GetScore(pct *PollCandidateTally) (_ string) {
 	score := ""
 
-	ct := *pct // looks like it's a copy of the primitives at least
+	ct := pct.Copy()
 
 	for _, _ = range pct.Poll.GetGradationList() {
-		//for _, _ = range pct.Poll.GetGrades() {
-
 		medianGrade := ct.GetMedian()
 		score += fmt.Sprintf("%03d", medianGrade)
 

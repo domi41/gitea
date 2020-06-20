@@ -36,6 +36,26 @@ type PollCandidateTally struct {
 	CreatedUnix     timeutil.TimeStamp
 }
 
+func (pct *PollCandidateTally) Copy() (_ *PollCandidateTally) {
+
+	grades := make([]*PollCandidateGradeTally, 0, 8)
+	for _, grade := range pct.Grades {
+		grades = append(grades, &PollCandidateGradeTally{
+			Grade:       grade.Grade,
+			Amount:      grade.Amount,
+			CreatedUnix: grade.CreatedUnix,
+		})
+	}
+
+	return &PollCandidateTally{
+		Poll:            pct.Poll,
+		CandidateID:     pct.CandidateID,
+		Grades:          grades,
+		JudgmentsAmount: pct.JudgmentsAmount,
+		CreatedUnix:     pct.CreatedUnix,
+	}
+}
+
 func (pct *PollCandidateTally) GetMedian() (_ uint8) {
 
 	if 0 == pct.JudgmentsAmount {
@@ -93,7 +113,6 @@ func (pct *PollCandidateTally) GetBiggestGroup(aroundGrade uint8) (groupSize int
 		return aboveGroupSize, aboveGroupSign, aboveGroupGrade
 	}
 	return belowGroupSize, belowGroupSign, belowGroupGrade
-
 }
 
 func (pct *PollCandidateTally) RegradeJudgments(fromGrade uint8, toGrade uint8) {
@@ -117,13 +136,6 @@ type PollTally struct {
 	Candidates         []*PollCandidateTally
 	CreatedUnix        timeutil.TimeStamp
 }
-
-//// PollCandidateGrades implements sort.Interface based on the Score field.
-//type PollCandidateGrades []*PollCandidateGradeTally
-//
-//func (a PollCandidateGrades) Len() int           { return len(a) }
-//func (a PollCandidateGrades) Less(i, j int) bool { return a[i].Score < a[j].Score }
-//func (a PollCandidateGrades) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 //  _____     _ _ _
 // |_   _|_ _| | (_) ___ _ __
