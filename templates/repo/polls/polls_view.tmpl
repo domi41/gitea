@@ -1,5 +1,12 @@
 {{ template "base/head" . }}
 
+{{/*
+
+Index of the candidates for this poll.
+The candidates are sorted by decreasing poll success.
+
+*/}}
+
 <div class="repository polls">
 	{{ template "repo/header" . }}
 	<div class="ui container">
@@ -16,15 +23,14 @@
 		<div>
 			<h2>{{ .Poll.Subject }}</h2>
 
+			{{ if .Poll.RenderedDescription }}
 			<div class="ui attached segment">
 				<div class="render-content markdown">
-					{{ if .Poll.RenderedDescription }}
 						{{ .Poll.RenderedDescription|Str2html }}
-					{{ else }}
-						<span class="no-content">{{ .i18n.Tr "repo.polls.no_description" }}</span>
-					{{ end }}
+{{/*						<span class="no-content">{{ .i18n.Tr "repo.polls.no_description" }}</span>*/}}
 				</div>
 			</div>
+			{{ end }}
 		</div>
 
 		{{/* Move these away once they're stable */}}
