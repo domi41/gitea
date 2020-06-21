@@ -1,4 +1,4 @@
-// Copyright 2020 The Gitea Authors. All rights reserved.
+// Copyright 2020 The Macronavirus. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -45,7 +45,7 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 	}
 
 	amountOfGrades := len(poll.GetGradationList())
-	candidates := make(PollCandidateResults, 0, 64)
+	candidates := make(PollCandidateResults, 0, 64) // /!. 5k issues repos exist
 	creationTime := timeutil.TimeStampNow()
 
 	for _, candidateTally := range pollTally.Candidates {
@@ -84,6 +84,9 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 
 	sort.Sort(sort.Reverse(candidates))
 
+	// Rule: Multiple Candidates may have the same Position in case of perfect equality.
+	// or (for Randomized Condorcet evangelists)
+	// Rule: Multiple Candidates at perfect equality are shuffled.
 	previousScore := ""
 	for key, candidate := range candidates {
 		position := uint64(key + 1)
@@ -111,31 +114,16 @@ func (deli *PollNaiveDeliberator) Deliberate(poll *Poll) (_ *PollResult, err err
 //  ___) | (_| (_) | |  | | | | | (_| |
 // |____/ \___\___/|_|  |_|_| |_|\__, |
 //                               |___/
-
-func (deli *PollNaiveDeliberator) GetScore(pct *PollCandidateTally) (_ string) {
-	score := ""
-
-	ct := pct.Copy()
-
-	for _, _ = range pct.Poll.GetGradationList() {
-		medianGrade := ct.GetMedian()
-		score += fmt.Sprintf("%03d", medianGrade)
-
-		groupSize, groupSign, groupGrade := ct.GetBiggestGroup(medianGrade)
-		score += fmt.Sprintf("%012d",
-			int(ct.JudgmentsAmount)+groupSize*groupSign)
-
-		ct.RegradeJudgments(medianGrade, groupGrade)
-	}
-
-	return score
-}
+// String scoring is not the fastest but it was within reach of a Go newbie.
 
 /*
+This method follows the following algorithm:
+
 // Assume that each candidate has the same amount of judgments = MAX_JUDGES.
 // (best fill with 0=REJECT to allow posterior candidate addition, cf. <paper>)
+
 for each Candidate
-	ct = CandidateTally(Candidate) // sums of judgments, per grade, basically
+	tally = CandidateTally(Candidate) // sums of judgments, per grade, basically
 	score = "" // score is a string but could be raw bits
 	// When we append integers to score below,
 	// consider that we concatenate the string representation including leading zeroes
@@ -143,21 +131,37 @@ for each Candidate
 	// or the raw bits (unsigned and led as well) in case of a byte array.
 
 	for i in range(MAX_GRADES)
-		grade = ct.median()
+		grade = tally.median()
 		score.append(grade) // three digits will suffice for int8
-		// Collect biggest of the two groups outside of the median.
-		// Group Grade is the group"s grade adjacent to the median group
+		// Collect biggest of the two groups of grades outside of the median.
+		// Group Grade is the group's grade adjacent to the median group
 		// Group Sign is:
 		// - +1 if the group promotes higher grades (adhesion)
 		// - -1 if the group promotes lower grades (contestation)
 		// - ±0 if there is no spoon
-		group_size, group_sign, group_grade = ct.get_biggest_group()
-		// MAX_JUDGES is to deal with negative values lexicographically
+		group_size, group_sign, group_grade = tally.get_biggest_group()
+		// MAX_JUDGES offset to deal with negative values lexicographically
 		score.append(MAX_JUDGES + groups_sign * group_size)
 		// Move the median grades into the group grades
-		ct.regrade_judgments(grade, groups_grade)
+		tally.regrade_judgments(grade, groups_grade)
 
 	// Use it later in a bubble sort or whatever
 	Candidate.score = score
 
 */
+func (deli *PollNaiveDeliberator) GetScore(pct *PollCandidateTally) (_ string) {
+	score := ""
+
+	ct := pct.Copy() // /!. Poll is not a copy (nor does it have to be)
+
+	for _, _ = range pct.Poll.GetGradationList() {
+		medianGrade := ct.GetMedian()
+		score += fmt.Sprintf("%03d", medianGrade)
+		groupSize, groupSign, groupGrade := ct.GetBiggestGroup(medianGrade)
+		score += fmt.Sprintf("%012d",
+			int(ct.JudgmentsAmount)+groupSize*groupSign)
+		ct.RegradeJudgments(medianGrade, groupGrade)
+	}
+
+	return score
+}
