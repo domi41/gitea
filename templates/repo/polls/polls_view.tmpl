@@ -44,9 +44,7 @@ The candidates are sorted by decreasing poll success.
 		{{ $pollResult := .Poll.GetResult }}
 
 		<ul class="candidates issue list">
-
 			{{ range $key, $candidate := $pollResult.Candidates }}
-
 			<li class="item">
 				{{ template "repo/polls/merit_radial" $candidate.MeritProfile }}
 				&nbsp;
@@ -56,9 +54,10 @@ The candidates are sorted by decreasing poll success.
 				<a href="{{ $.AppSubUrl }}/{{ $.RepoRelPath }}/issues/{{ $candidate.CandidateID }}">
 					Issue
 					#{{ $candidate.CandidateID }}
+					:
+					{{ $candidate.GetCandidateName }}
 				</a>
 			</li>
-
 			{{ end }}
 		</ul>
 
