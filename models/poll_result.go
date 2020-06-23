@@ -32,7 +32,7 @@ func (result *PollCandidateResult) GetColorWord() (_ string) {
 }
 
 func (result *PollCandidateResult) GetCandidateName() (_ string) { // FIXME
-	isssue, err := GetIssueByID(result.CandidateID + 1000)
+	isssue, err := GetIssueByID(result.CandidateID)
 	if nil != err {
 		return "Candidate #" + strconv.FormatInt(result.CandidateID, 10)
 	}

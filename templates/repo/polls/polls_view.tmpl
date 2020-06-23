@@ -52,10 +52,8 @@ The candidates are sorted by decreasing poll success.
 				&mdash;
 				&nbsp;
 				<a href="{{ $.AppSubUrl }}/{{ $.RepoRelPath }}/issues/{{ $candidate.CandidateID }}">
-					Issue
-					#{{ $candidate.CandidateID }}
-					:
 					{{ $candidate.GetCandidateName }}
+					(#{{ $candidate.CandidateID }})
 				</a>
 			</li>
 			{{ end }}
