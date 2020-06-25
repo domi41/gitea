@@ -1,8 +1,12 @@
-{{/* A large label for polls' candidates. */}}
-{{/* No javascript for now.  There may be _some_. */}}
-{{/* .Poll : the Poll in question */}}
-{{/* .CandidateID : the Candidate */}}
-{{/* .Super : $ of parent template */}}
+{{/*
+
+A large label for polls' candidates.
+No javascript for now.  There may be _some_.
+.Poll : the Poll in question
+.CandidateID : the Candidate
+.Super : $ of parent template
+
+*/}}
 {{ $pollResult := .Poll.GetResult }}
 {{/*{{ $candidateID := .Issue.Index }}*/}}
 {{ $candidateID := .CandidateID }}
@@ -38,11 +42,20 @@
 	{{ if $.Super.IsSigned }}
 	<div class="judgment-forms">
 		{{ range $grade, $icon := .Poll.GetGradationList }}
-			<form class="judgment-form{{ if (eq $grade $userGrade) }} selected{{ end }}" action="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/polls/{{ $pollID }}/judgments" method="post">
+			<form class="judgment-form {{ if (eq $grade $userGrade) }}selected{{ end }}" action="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/polls/{{ $pollID }}/judgments" method="post">
 				{{ $.Super.CsrfTokenHtml }}
 				<input type="hidden" name="redirect" value="{{ $.Super.AppSubUrl }}/{{ $.Super.RepoRelPath }}/issues/{{ $candidateID }}">
 				<input type="hidden" name="grade" value="{{ $grade }}">
 				<input type="hidden" name="candidate" value="{{ $candidateID }}">
+
+				{{ if $pollCandidateResult }}
+				{{ if eq $pollCandidateResult.MedianGrade $grade }}
+				<div class="background-merit-profile">
+				{{ template "repo/polls/merit_radial" $pollCandidateResult.MeritProfile }}
+				</div>
+				{{ end }}
+				{{ end }}
+				{{/* Add the emote AFTER the profile or the absolute of the profile is offset (somehow) */}}
 				<input class="emote" type="submit" value="{{ $icon }}">
 			</form>
 		{{ end }}

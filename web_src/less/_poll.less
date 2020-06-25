@@ -10,7 +10,13 @@
 @mobile: ~"only screen and (max-width: 600px)";
 
 
-/* Emote Support */
+/*
+Emote Support
+
+What would be a good approach here?
+Perhaps we should provide a font as well, for emotes.
+Privilege ubiquitous emotes nonetheless, for accessibility.
+*/
 .emote {
     font-family: "Source Code Pro", Consolas, monaco, monospace !important;
 }
@@ -77,6 +83,7 @@
     /*transition: left 0.4s ease-out 0s, opacity 0.3s ease-out 0s;*/
 }
 
+
 /* Since transitions won't play with a change of display, we use animation */
 @keyframes fade_in_judgment_forms {
     0% {
@@ -106,6 +113,7 @@
 }
 
 .judgment-form input.emote {
+    position: relative;
     font-size: 1.618em;
     width: 1.818rem;
     height: 1.918rem;
@@ -115,6 +123,7 @@
     background: none;
     transition: 0.3s filter, 0.2s transform;
     cursor: pointer;
+    z-index: 2;
 
 }
 
@@ -132,6 +141,7 @@
     font-size: 3em;
     opacity: 0.8;
     pointer-events: none;
+    z-index: 3;
 }
 
 .judgment-form input.emote:hover,
@@ -139,4 +149,11 @@
     background: none;
     filter: grayscale(0.0);
     transform: scale(1.1);
+}
+
+.background-merit-profile {
+    position: absolute;
+    top: -0.29em;
+    left: -0.3em;
+    z-index: 1;
 }
