@@ -6,7 +6,7 @@
 // |_|   \___/|_|_|___/
 //
 
-
+// Poll Badges require tweaking on mobile to stack vertically ; improve at will
 @mobile: ~"only screen and (max-width: 600px)";
 
 
@@ -16,6 +16,8 @@ Emote Support
 What would be a good approach here?
 Perhaps we should provide a font as well, for emotes.
 Privilege ubiquitous emotes nonetheless, for accessibility.
+Research notes:
+- SVGinOT  (is that what firefox uses already?)
 */
 .emote {
     font-family: "Source Code Pro", Consolas, monaco, monospace !important;
@@ -58,7 +60,7 @@ Privilege ubiquitous emotes nonetheless, for accessibility.
     /* Otherwise the h1 blocks a portion of the label's hover area */
     position: relative;
     z-index: 1;
-    /***************************************************************/
+
     @media @mobile {
         display: block;
     }
@@ -74,13 +76,13 @@ Privilege ubiquitous emotes nonetheless, for accessibility.
 
 .judgment-forms {
     display: none;
-    vertical-align: middle;
     position: relative;
     top: 0;
     left: -90px; /* keep as fallback */
     opacity: 0.0; /* keep as fallback */
     animation: fade_in_judgment_forms 0.4s ease-out;
     /*transition: left 0.4s ease-out 0s, opacity 0.3s ease-out 0s;*/
+    vertical-align: middle;
 }
 
 
@@ -106,25 +108,24 @@ Privilege ubiquitous emotes nonetheless, for accessibility.
 }
 
 .judgment-form {
+    display: inline-block;
     position: relative;
     margin: 0;
     padding: 0;
-    display: inline-block;
 }
 
 .judgment-form input.emote {
     position: relative;
-    font-size: 1.618em;
     width: 1.818rem;
     height: 1.918rem;
     padding: 0;
     margin: 0;
     border: 0;
+    font-size: 1.618em;
     background: none;
     transition: 0.3s filter, 0.2s transform;
     cursor: pointer;
     z-index: 2;
-
 }
 
 .judgment-form:not(.selected) input.emote {
@@ -133,14 +134,14 @@ Privilege ubiquitous emotes nonetheless, for accessibility.
 
 .judgment-form.selected:focus-within::after,
 .judgment-form.selected:hover::after {
-    color: darkred;
-    position: absolute;
     content: "×";
+    pointer-events: none;
+    position: absolute;
     top: 0.05em;
     left: 0.05em;
-    font-size: 3em;
+    color: darkred;
     opacity: 0.8;
-    pointer-events: none;
+    font-size: 3em;
     z-index: 3;
 }
 
@@ -151,9 +152,30 @@ Privilege ubiquitous emotes nonetheless, for accessibility.
     transform: scale(1.1);
 }
 
+
+//  __  __           _ _   ____             __ _ _
+// |  \/  | ___ _ __(_) |_|  _ \ _ __ ___  / _(_) | ___
+// | |\/| |/ _ \ '__| | __| |_) | '__/ _ \| |_| | |/ _ \
+// | |  | |  __/ |  | | |_|  __/| | | (_) |  _| | |  __/
+// |_|  |_|\___|_|  |_|\__|_|   |_|  \___/|_| |_|_|\___|
+//
+
 .background-merit-profile {
     position: absolute;
     top: -0.29em;
     left: -0.3em;
     z-index: 1;
+}
+
+
+//   ____                _ _     _       _
+//  / ___|__ _ _ __   __| (_) __| | __ _| |_ ___  ___
+// | |   / _` | '_ \ / _` | |/ _` |/ _` | __/ _ \/ __|
+// | |__| (_| | | | | (_| | | (_| | (_| | ||  __/\__ \
+//  \____\__,_|_| |_|\__,_|_|\__,_|\__,_|\__\___||___/
+//
+
+ul.candidates.list li {
+    display: flex;
+    align-items: center; /* align vertically */
 }
